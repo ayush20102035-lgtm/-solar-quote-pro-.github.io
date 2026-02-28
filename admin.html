@@ -3,232 +3,305 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SolarQuote Admin</title>
+<title>SolarQuote Admin — Ayush</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0f1e;color:#e2e8f0;min-height:100vh;}
 input,select,textarea,button{font-family:inherit;}
-.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-box{background:#1e293b;border-radius:16px;padding:32px 28px;width:100%;max-width:360px;border:1px solid #334155;}
-.badge{background:#ff6b00;color:white;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:800;display:inline-block;margin-bottom:10px;}
-.field{margin-bottom:14px;}
-.field label{font-size:12px;color:#94a3b8;display:block;margin-bottom:5px;font-weight:600;}
-.field input,.field textarea,.field select{width:100%;padding:11px 13px;border-radius:9px;border:1px solid #334155;font-size:14px;outline:none;background:#0f172a;color:#e2e8f0;}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:#ff6b00;}
-.btn-primary{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:14px;font-weight:800;cursor:pointer;}
-.btn-primary:disabled{background:#334155;cursor:not-allowed;}
-.app{display:none;min-height:100vh;}
-nav{background:#1e293b;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #334155;position:sticky;top:0;z-index:100;}
-.nav-logo{display:flex;align-items:center;gap:10px;}
-.nav-sun{width:34px;height:34px;background:#ff6b00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;}
-.tabs{display:flex;background:#1e293b;border-bottom:1px solid #334155;overflow-x:auto;}
-.tab{padding:11px 16px;font-size:12px;font-weight:700;color:#64748b;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;}
-.tab.active{color:#ff6b00;border-bottom-color:#ff6b00;}
-.page{display:none;padding:16px;}
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0a0f1e,#1a1f3e);}
+.login-box{background:#111827;border-radius:20px;padding:36px 28px;width:100%;max-width:360px;border:1px solid #1f2937;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.admin-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;margin-bottom:14px;}
+.lfield{margin-bottom:14px;}
+.lfield label{font-size:12px;color:#6b7280;display:block;margin-bottom:5px;font-weight:600;}
+.lfield input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #1f2937;font-size:14px;outline:none;background:#0a0f1e;color:#e2e8f0;transition:border-color 0.2s;}
+.lfield input:focus{border-color:#ff6b00;}
+.btn-login{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,0,0.3);}
+.btn-login:disabled{background:#374151;box-shadow:none;cursor:not-allowed;}
+.err-box{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:14px;background:#450a0a;color:#f87171;border:1px solid #7f1d1d;display:none;}
+/* APP */
+.app{display:none;min-height:100vh;background:#0a0f1e;}
+/* TOPBAR */
+.topbar{background:#111827;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1f2937;position:sticky;top:0;z-index:100;}
+.logo-area{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#ff6b00,#ff9500);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-text{font-weight:800;font-size:14px;line-height:1.1;}
+.logo-sub{font-size:10px;color:#6b7280;}
+.owner-badge{background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:800;}
+/* TABS */
+.tab-bar{display:flex;background:#111827;border-bottom:1px solid #1f2937;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tab-btn{padding:12px 16px;font-size:12px;font-weight:700;color:#6b7280;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab-btn.active{color:#ff6b00;border-bottom-color:#ff6b00;}
+/* PAGES */
+.page{display:none;padding:16px;max-width:700px;margin:0 auto;}
 .page.active{display:block;}
+/* CARDS */
+.card{background:#111827;border-radius:16px;border:1px solid #1f2937;margin-bottom:14px;overflow:hidden;}
+.card-header{padding:14px 16px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-weight:800;font-size:13px;display:flex;align-items:center;gap:8px;}
+/* STATS */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.stat-box{background:#1e293b;border-radius:12px;padding:14px 16px;border:1px solid #334155;}
-.stat-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.stat-val{font-size:22px;font-weight:800;}
-.card{background:#1e293b;border-radius:14px;border:1px solid #334155;margin-bottom:14px;overflow:hidden;}
-.card-title{padding:14px 16px;border-bottom:1px solid #334155;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:space-between;}
-.plan-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;}
-.plan-free{background:#1c1917;color:#f97316;}
-.plan-pro{background:#1e1b4b;color:#818cf8;}
-.plan-business{background:#052e16;color:#4ade80;}
-.user-item{padding:14px 16px;border-bottom:1px solid #1e293b;}
-.user-item:last-child{border-bottom:none;}
-.action-btn{padding:5px 12px;border-radius:7px;border:none;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px;margin-top:4px;}
-.btn-deact{background:#450a0a;color:#f87171;}
-.btn-act{background:#052e16;color:#4ade80;}
-select.plan-select{background:#0f172a;color:#e2e8f0;border:1px solid #334155;border-radius:7px;padding:5px 8px;font-size:12px;font-weight:700;cursor:pointer;}
-.search-box{width:100%;padding:10px 12px;border-radius:9px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:13px;outline:none;margin-bottom:12px;}
-.search-box:focus{border-color:#ff6b00;}
-.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;padding:11px 20px;border-radius:12px;font-weight:700;font-size:13px;color:white;display:none;box-shadow:0 4px 20px rgba(0,0,0,0.4);white-space:nowrap;}
-.toast.show{display:block;}
-.empty{text-align:center;padding:40px;color:#64748b;}
+.stat-card{background:#111827;border-radius:14px;padding:16px;border:1px solid #1f2937;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.stat-card.orange::before{background:linear-gradient(90deg,#ff6b00,#ff9500);}
+.stat-card.blue::before{background:linear-gradient(90deg,#3b82f6,#8b5cf6);}
+.stat-card.green::before{background:linear-gradient(90deg,#10b981,#34d399);}
+.stat-card.yellow::before{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+.stat-label{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.stat-val{font-size:24px;font-weight:800;line-height:1;}
+.stat-sub{font-size:11px;color:#4b5563;margin-top:4px;}
+/* PLAN BADGES */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;}
+.b-free{background:#1c1917;color:#f97316;}
+.b-pro{background:#1e1b4b;color:#818cf8;}
+.b-business{background:#052e16;color:#4ade80;}
+/* USERS */
+.user-row{padding:14px 16px;border-bottom:1px solid #1f2937;}
+.user-row:last-child{border-bottom:none;}
+.user-name{font-weight:700;font-size:14px;margin-bottom:3px;}
+.user-meta{font-size:11px;color:#6b7280;margin-bottom:8px;line-height:1.8;}
+.user-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.act-btn{padding:6px 12px;border-radius:8px;border:none;font-size:11px;font-weight:700;cursor:pointer;}
+.act-deact{background:#450a0a;color:#f87171;}
+.act-activ{background:#052e16;color:#4ade80;}
+.act-msg{background:#1e1b4b;color:#818cf8;}
+.plan-sel{background:#0a0f1e;color:#e2e8f0;border:1px solid #374151;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;outline:none;}
+/* QUOTES LIST */
+.q-row{padding:14px 16px;border-bottom:1px solid #1f2937;}
+.q-row:last-child{border-bottom:none;}
 /* BAR CHART */
-.bar-chart{display:flex;flex-direction:column;gap:8px;padding:16px;}
+.bar-chart{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
 .bar-row{display:flex;align-items:center;gap:10px;}
-.bar-label{font-size:11px;color:#94a3b8;width:60px;flex-shrink:0;text-align:right;}
-.bar-track{flex:1;height:20px;background:#0f172a;border-radius:4px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:11px;font-weight:700;color:white;transition:width 1s;}
-.bar-val{font-size:11px;color:#94a3b8;width:70px;flex-shrink:0;}
-/* MINI CHART */
-.mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;padding:10px 16px;}
-.mini-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height 0.8s;}
-/* MSG MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
-.modal-overlay.show{display:flex;}
-.modal{background:#1e293b;border-radius:18px;padding:24px;width:100%;max-width:420px;border:1px solid #334155;}
-.modal h3{font-size:16px;font-weight:800;margin-bottom:16px;}
-.revenue-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #1e293b;}
-.revenue-row:last-child{border-bottom:none;}
-@media(max-width:400px){.stat-grid{grid-template-columns:1fr;}}
+.bar-lbl{font-size:11px;color:#6b7280;width:75px;flex-shrink:0;text-align:right;}
+.bar-track{flex:1;height:22px;background:#0a0f1e;border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:800;color:white;transition:width 1s ease;}
+.bar-num{font-size:11px;color:#6b7280;width:60px;flex-shrink:0;}
+/* WEEK CHART */
+.week-wrap{padding:14px 16px;}
+.week-bars{display:flex;align-items:flex-end;gap:5px;height:70px;margin-bottom:6px;}
+.week-bar{flex:1;border-radius:4px 4px 0 0;min-height:4px;transition:height 0.8s;}
+.week-days{display:flex;gap:5px;}
+.week-day{flex:1;text-align:center;font-size:10px;color:#6b7280;}
+/* REVENUE */
+.rev-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #1f2937;}
+.rev-row:last-child{border-bottom:none;}
+.rev-row.total{background:#0a0f1e;}
+/* SEARCH */
+.search-inp{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #1f2937;background:#0a0f1e;color:#e2e8f0;font-size:13px;outline:none;margin-bottom:12px;}
+.search-inp:focus{border-color:#ff6b00;}
+/* MSG */
+.msg-field{margin-bottom:12px;}
+.msg-field label{font-size:12px;color:#6b7280;display:block;margin-bottom:5px;font-weight:600;}
+.msg-field input,.msg-field select,.msg-field textarea{width:100%;padding:10px 13px;border-radius:9px;border:1px solid #1f2937;font-size:13px;outline:none;background:#0a0f1e;color:#e2e8f0;}
+.msg-field input:focus,.msg-field select:focus,.msg-field textarea:focus{border-color:#ff6b00;}
+.btn-send{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:14px;font-weight:800;cursor:pointer;}
+.sent-msg{padding:12px 16px;border-bottom:1px solid #1f2937;}
+.sent-msg:last-child{border-bottom:none;}
+/* MODAL */
+.modal-over{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.modal-over.show{display:flex;}
+.modal-box{background:#111827;border-radius:18px;padding:24px;width:100%;max-width:400px;border:1px solid #1f2937;}
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999;padding:12px 22px;border-radius:12px;font-weight:800;font-size:13px;color:white;display:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,0.5);}
+.toast.show{display:block;}
+.empty{text-align:center;padding:40px;color:#4b5563;}
+@media(max-width:380px){.stat-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="login-screen" id="loginScreen">
+<div class="login-wrap" id="loginWrap">
   <div class="login-box">
-    <div class="badge">🔧 ADMIN PANEL</div>
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:4px;">SolarQuote Pro</h2>
-    <div style="font-size:12px;color:#64748b;margin-bottom:20px;">Admin access only</div>
-    <div id="loginMsg" style="display:none;padding:10px;border-radius:8px;background:#450a0a;color:#f87171;font-size:13px;font-weight:600;margin-bottom:12px;border:1px solid #7f1d1d;"></div>
-    <div class="field"><label>Admin Email</label><input type="email" id="lEmail" placeholder="admin@example.com"/></div>
-    <div class="field"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <button class="btn-primary" id="loginBtn" onclick="doLogin()">🔐 Admin Login</button>
+    <div class="admin-badge">🔧 OWNER PANEL</div>
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;">SolarQuote Pro</h2>
+    <p style="font-size:12px;color:#6b7280;margin-bottom:20px;">Owner access only — Ayush</p>
+    <div class="err-box" id="loginErr"></div>
+    <div class="lfield"><label>Email</label><input type="email" id="lEmail" placeholder="ayush20102035@gmail.com"/></div>
+    <div class="lfield"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">🔐 Owner Login</button>
+    <div style="text-align:center;margin-top:14px;font-size:11px;color:#374151;">🔒 Restricted to owner only</div>
   </div>
 </div>
 
-<!-- ADMIN APP -->
+<!-- APP -->
 <div class="app" id="adminApp">
-  <nav>
-    <div class="nav-logo">
-      <div class="nav-sun">🔧</div>
+  <div class="topbar">
+    <div class="logo-area">
+      <div class="logo-icon">☀</div>
       <div>
-        <div style="font-weight:800;font-size:14px;">Admin Panel</div>
-        <div style="font-size:10px;color:#64748b;" id="adminEmail">...</div>
+        <div class="logo-text">Admin Panel</div>
+        <div class="logo-sub">SolarQuote Pro — Owner</div>
       </div>
     </div>
-    <button onclick="doLogout()" style="padding:7px 16px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;">Logout</button>
-  </nav>
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
-    <button class="tab" onclick="showTab('revenue')">💰 Revenue</button>
-    <button class="tab" onclick="showTab('analytics')">📈 Analytics</button>
-    <button class="tab" onclick="showTab('users')">👥 Users</button>
-    <button class="tab" onclick="showTab('messages')">📢 Messages</button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="owner-badge">👑 Ayush</span>
+      <button onclick="doLogout()" style="padding:7px 12px;border-radius:8px;border:1px solid #1f2937;background:#0a0f1e;color:#6b7280;font-size:12px;font-weight:700;cursor:pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('overview')">📊 Overview</button>
+    <button class="tab-btn" onclick="showTab('revenue')">💰 Revenue</button>
+    <button class="tab-btn" onclick="showTab('analytics')">📈 Analytics</button>
+    <button class="tab-btn" onclick="showTab('users')">👥 Users</button>
+    <button class="tab-btn" onclick="showTab('allquotes')">📋 Quotes</button>
+    <button class="tab-btn" onclick="showTab('messages')">📢 Messages</button>
   </div>
 
   <!-- OVERVIEW -->
   <div class="page active" id="tab-overview">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-label">Total Users</div><div class="stat-val" id="ovUsers" style="color:#ff6b00">-</div></div>
-        <div class="stat-box"><div class="stat-label">Total Quotes</div><div class="stat-val" id="ovQuotes" style="color:#818cf8">-</div></div>
-        <div class="stat-box"><div class="stat-label">Pro/Business</div><div class="stat-val" id="ovPaid" style="color:#4ade80">-</div></div>
-        <div class="stat-box"><div class="stat-label">Quotes Today</div><div class="stat-val" id="ovToday" style="color:#fbbf24">-</div></div>
+    <div style="margin-bottom:12px;padding:14px 16px;background:#111827;border-radius:14px;border:1px solid #1f2937;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:28px;">👑</div>
+      <div>
+        <div style="font-weight:800;font-size:14px;">Welcome back, Ayush!</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:2px;" id="ovDate">Loading...</div>
       </div>
-      <div class="card">
-        <div class="card-title">📊 Plan Distribution</div>
-        <div id="planChart" class="bar-chart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">🕐 Recent Signups</div>
-        <div id="recentSignups"></div>
-      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card orange"><div class="stat-label">Total Users</div><div class="stat-val" id="ovUsers" style="color:#ff6b00">—</div><div class="stat-sub">Registered installers</div></div>
+      <div class="stat-card blue"><div class="stat-label">Total Quotes</div><div class="stat-val" id="ovQuotes" style="color:#818cf8">—</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card green"><div class="stat-label">Paid Users</div><div class="stat-val" id="ovPaid" style="color:#4ade80">—</div><div class="stat-sub">Pro + Business</div></div>
+      <div class="stat-card yellow"><div class="stat-label">Today's Quotes</div><div class="stat-val" id="ovToday" style="color:#fbbf24">—</div><div class="stat-sub">Generated today</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 Plan Distribution</div></div>
+      <div id="planChart" class="bar-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🕐 Latest Signups</div><span id="signupCount" style="font-size:12px;color:#6b7280;"></span></div>
+      <div id="recentSignups"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 Latest Quotes</div></div>
+      <div id="recentQuotes"></div>
     </div>
   </div>
 
   <!-- REVENUE -->
   <div class="page" id="tab-revenue">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-label">MRR (Monthly)</div><div class="stat-val" id="revMRR" style="color:#4ade80;font-size:16px">-</div></div>
-        <div class="stat-box"><div class="stat-label">ARR (Annual)</div><div class="stat-val" id="revARR" style="color:#4ade80;font-size:16px">-</div></div>
-        <div class="stat-box"><div class="stat-label">Pro Users</div><div class="stat-val" id="revPro" style="color:#818cf8">-</div></div>
-        <div class="stat-box"><div class="stat-label">Business Users</div><div class="stat-val" id="revBiz" style="color:#4ade80">-</div></div>
+    <div class="stat-grid">
+      <div class="stat-card green"><div class="stat-label">MRR</div><div class="stat-val" id="revMRR" style="color:#4ade80;font-size:18px">—</div><div class="stat-sub">Monthly Revenue</div></div>
+      <div class="stat-card green"><div class="stat-label">ARR</div><div class="stat-val" id="revARR" style="color:#4ade80;font-size:18px">—</div><div class="stat-sub">Annual Revenue</div></div>
+      <div class="stat-card blue"><div class="stat-label">Pro Users</div><div class="stat-val" id="revPro" style="color:#818cf8">—</div><div class="stat-sub">₹799/month each</div></div>
+      <div class="stat-card yellow"><div class="stat-label">Business Users</div><div class="stat-val" id="revBiz" style="color:#fbbf24">—</div><div class="stat-sub">₹1999/month each</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">💰 Revenue Breakdown</div></div>
+      <div id="revBreakdown"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🚀 Growth Potential</div></div>
+      <div style="padding:14px 16px;">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">If free users convert to Pro (₹799/mo):</div>
+        <div id="growthCalc"></div>
       </div>
-      <div class="card">
-        <div class="card-title">💰 Revenue Breakdown</div>
-        <div id="revenueBreakdown"></div>
+    </div>
+    <div class="card" style="border-color:#ff6b00;">
+      <div class="card-header" style="background:linear-gradient(135deg,#1a0a00,#2a1000);border-bottom-color:#ff6b00;">
+        <div class="card-title" style="color:#ff6b00;">💡 Revenue Tips</div>
       </div>
-      <div class="card">
-        <div class="card-title">📈 Growth Potential</div>
-        <div style="padding:16px;">
-          <div style="font-size:12px;color:#64748b;margin-bottom:12px;">If free users convert to Pro (₹799/mo):</div>
-          <div id="growthPotential"></div>
-        </div>
+      <div style="padding:14px 16px;font-size:12px;color:#9ca3af;line-height:2;">
+        • WhatsApp free users about Pro plan benefits<br/>
+        • Offer 1 month free trial to convert<br/>
+        • Business plan = unlimited quotes + priority support<br/>
+        • Target high-volume installers (10+ quotes/month)
       </div>
     </div>
   </div>
 
   <!-- ANALYTICS -->
   <div class="page" id="tab-analytics">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="card">
-        <div class="card-title">📋 Quotes by State</div>
-        <div id="stateChart" class="bar-chart"></div>
+    <div class="stat-grid">
+      <div class="stat-card orange"><div class="stat-label">Avg System Size</div><div class="stat-val" id="avgKwp" style="color:#ff6b00;font-size:18px">—</div><div class="stat-sub">kWp per quote</div></div>
+      <div class="stat-card green"><div class="stat-label">Avg Quote Value</div><div class="stat-val" id="avgVal" style="color:#4ade80;font-size:16px">—</div><div class="stat-sub">Net cost avg</div></div>
+      <div class="stat-card blue"><div class="stat-label">Pipeline Value</div><div class="stat-val" id="pipeVal" style="color:#818cf8;font-size:16px">—</div><div class="stat-sub">Open quotes</div></div>
+      <div class="stat-card yellow"><div class="stat-label">Won Deals</div><div class="stat-val" id="wonDeals" style="color:#fbbf24">—</div><div class="stat-sub">Closed status</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 Quotes This Week</div></div>
+      <div class="week-wrap">
+        <div class="week-bars" id="weekBars"></div>
+        <div class="week-days" id="weekDays"></div>
       </div>
-      <div class="card">
-        <div class="card-title">⚡ System Size Distribution</div>
-        <div id="sizeChart" class="bar-chart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Quote Status Breakdown</div>
-        <div id="statusChart" class="bar-chart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📅 Quotes This Week</div>
-        <div style="padding:16px 16px 0;">
-          <div class="mini-chart" id="weekChart"></div>
-          <div style="display:flex;justify-content:space-around;padding:0 0 12px;font-size:10px;color:#64748b;" id="weekLabels"></div>
-        </div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-box"><div class="stat-label">Avg System Size</div><div class="stat-val" id="avgKwp" style="color:#ff6b00;font-size:18px">-</div></div>
-        <div class="stat-box"><div class="stat-label">Avg Quote Value</div><div class="stat-val" id="avgVal" style="color:#4ade80;font-size:14px">-</div></div>
-        <div class="stat-box"><div class="stat-label">Total Pipeline</div><div class="stat-val" id="totalPipe" style="color:#818cf8;font-size:14px">-</div></div>
-        <div class="stat-box"><div class="stat-label">Closed Won</div><div class="stat-val" id="closedWon" style="color:#4ade80">-</div></div>
-      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🗺 Top States</div></div>
+      <div id="stateChart" class="bar-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚡ System Size Distribution</div></div>
+      <div id="sizeChart" class="bar-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 Quote Status Breakdown</div></div>
+      <div id="statusChart" class="bar-chart"></div>
     </div>
   </div>
 
   <!-- USERS -->
   <div class="page" id="tab-users">
-    <div style="max-width:700px;margin:0 auto;">
-      <input class="search-box" id="userSearch" placeholder="🔍 Search by company..." oninput="filterUsers()"/>
-      <div class="card">
-        <div class="card-title"><span>👥 All Users</span><span id="userCount" style="font-size:12px;color:#64748b;">-</span></div>
-        <div id="userList"><div class="empty">Loading...</div></div>
+    <input class="search-inp" id="userSearch" placeholder="🔍 Search by company or phone..." oninput="filterUsers()"/>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👥 All Users</div>
+        <span id="userCount" style="font-size:12px;color:#6b7280;">—</span>
       </div>
+      <div id="userList"><div class="empty">Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- ALL QUOTES -->
+  <div class="page" id="tab-allquotes">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 All Quotes</div>
+        <span id="qtotal" style="font-size:12px;color:#6b7280;">—</span>
+      </div>
+      <div id="allQuotesList"><div class="empty">Loading...</div></div>
     </div>
   </div>
 
   <!-- MESSAGES -->
   <div class="page" id="tab-messages">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="card">
-        <div class="card-title">📢 Send Message to User</div>
-        <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
-          <div class="field" style="margin:0;">
-            <label>Select User</label>
-            <select id="msgUser"><option value="">-- Select User --</option></select>
-          </div>
-          <div class="field" style="margin:0;">
-            <label>Or Send to ALL Users</label>
-            <select id="msgAll">
-              <option value="">Specific user only</option>
-              <option value="all">📢 All Users</option>
-              <option value="free">Free Users only</option>
-              <option value="pro">Pro Users only</option>
-              <option value="business">Business Users only</option>
-            </select>
-          </div>
-          <div class="field" style="margin:0;"><label>Subject</label><input id="msgSubject" placeholder="Important Update / Offer / Notice..."/></div>
-          <div class="field" style="margin:0;"><label>Message</label><textarea id="msgBody" rows="4" placeholder="Type your message here..."></textarea></div>
-          <button onclick="sendMessage()" style="padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-weight:800;cursor:pointer;font-size:14px;">📢 Send Message</button>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📢 Send Message to Users</div></div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+        <div class="msg-field">
+          <label>Target Audience</label>
+          <select id="msgTarget">
+            <option value="all">📢 All Users</option>
+            <option value="free">🟠 Free Users Only</option>
+            <option value="pro">🟣 Pro Users Only</option>
+            <option value="business">🟢 Business Users Only</option>
+            <option value="one">👤 Specific User</option>
+          </select>
         </div>
+        <div class="msg-field" id="specificUserDiv" style="display:none;">
+          <label>Select User</label>
+          <select id="msgUser"><option value="">-- Select --</option></select>
+        </div>
+        <div class="msg-field"><label>Subject / Title</label><input id="msgSubject" placeholder="New Feature / Important Update / Offer..."/></div>
+        <div class="msg-field"><label>Message Body</label><textarea id="msgBody" rows="4" placeholder="Write your message here..."></textarea></div>
+        <button class="btn-send" onclick="previewMsg()">📢 Preview & Send</button>
       </div>
-      <div class="card">
-        <div class="card-title">📬 Sent Messages</div>
-        <div id="sentMessages"><div class="empty">Loading...</div></div>
-      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📬 Sent Messages</div></div>
+      <div id="sentMsgs"><div class="empty">Loading...</div></div>
     </div>
   </div>
 </div>
 
-<!-- MSG PREVIEW MODAL -->
-<div class="modal-overlay" id="msgModal">
-  <div class="modal">
-    <h3>📢 Message Preview</h3>
-    <div id="msgPreview"></div>
-    <div style="display:flex;gap:10px;margin-top:16px;">
-      <button onclick="confirmSend()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#ff6b00;color:white;font-weight:800;cursor:pointer;">✅ Confirm Send</button>
-      <button onclick="document.getElementById('msgModal').classList.remove('show')" style="padding:12px 18px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#94a3b8;font-weight:700;cursor:pointer;">Cancel</button>
+<!-- CONFIRM MODAL -->
+<div class="modal-over" id="confirmModal">
+  <div class="modal-box">
+    <h3 style="font-size:16px;font-weight:800;margin-bottom:14px;">📢 Confirm Send</h3>
+    <div id="modalPreview" style="background:#0a0f1e;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.7;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="confirmSend()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#ff6b00;color:white;font-weight:800;cursor:pointer;">✅ Send Now</button>
+      <button onclick="document.getElementById('confirmModal').classList.remove('show')" style="padding:12px 16px;border-radius:10px;border:1px solid #374151;background:#0a0f1e;color:#9ca3af;font-weight:700;cursor:pointer;">Cancel</button>
     </div>
   </div>
 </div>
@@ -236,281 +309,321 @@ select.plan-select{background:#0f172a;color:#e2e8f0;border:1px solid #334155;bor
 <div class="toast" id="toast"></div>
 
 <script>
+const ADMIN_EMAIL='ayush20102035@gmail.com';
 const SB=supabase.createClient('https://sveixtxuascbvoeyxqgl.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZWl4dHh1YXNjYnZvZXl4cWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxOTI3MDQsImV4cCI6MjA4Nzc2ODcwNH0.t6Bs8weRt4EMjiX0aICArsGaVS6buiakrPST4RVsfHY');
+let AU=[],AQ=[];
+const PRICES={free:0,pro:799,business:1999};
 
-let allUsers=[],allQuotes=[];
-const PLANS={free:{price:0,label:'Free'},pro:{price:799,label:'Pro'},business:{price:1999,label:'Business'}};
-
-function inr(n){const a=Math.abs(Math.round(n));const s=a.toString();if(s.length<=3)return(n<0?'-':'')+'₹'+s;let r=s.slice(-3),m=s.slice(0,-3);while(m.length>2){r=m.slice(-2)+','+r;m=m.slice(0,-2);}return(n<0?'-':'')+'₹'+m+','+r;}
+function inr(n){if(!n)return'₹0';const a=Math.abs(Math.round(n));const s=a.toString();if(s.length<=3)return'₹'+s;let r=s.slice(-3),m=s.slice(0,-3);while(m.length>2){r=m.slice(-2)+','+r;m=m.slice(0,-2);}return'₹'+m+','+r;}
 function showToast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#16a34a':'#dc2626';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function fmtDate(d){return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
 
-// AUTH
+// LOGIN — only allow admin email
 async function doLogin(){
-  const email=document.getElementById('lEmail').value.trim();
+  const email=document.getElementById('lEmail').value.trim().toLowerCase();
   const pass=document.getElementById('lPass').value;
-  const msg=document.getElementById('loginMsg');
-  if(!email||!pass){msg.style.display='block';msg.textContent='Fill all fields';return;}
-  document.getElementById('loginBtn').disabled=true;document.getElementById('loginBtn').textContent='Logging in...';
+  const err=document.getElementById('loginErr');
+  // Block non-admin
+  if(email!==ADMIN_EMAIL){err.style.display='block';err.textContent='⛔ Access denied. Owner only.';return;}
+  if(!pass){err.style.display='block';err.textContent='Enter password';return;}
+  document.getElementById('loginBtn').disabled=true;document.getElementById('loginBtn').textContent='Verifying...';
   const {data,error}=await SB.auth.signInWithPassword({email,password:pass});
-  if(error){msg.style.display='block';msg.textContent='Invalid credentials';document.getElementById('loginBtn').disabled=false;document.getElementById('loginBtn').textContent='🔐 Admin Login';return;}
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('adminApp').style.display='block';
-  document.getElementById('adminEmail').textContent=email;
-  loadAll();
+  if(error){err.style.display='block';err.textContent='Invalid credentials';document.getElementById('loginBtn').disabled=false;document.getElementById('loginBtn').textContent='🔐 Owner Login';return;}
+  // Double check email
+  if(data.user.email!==ADMIN_EMAIL){await SB.auth.signOut();err.style.display='block';err.textContent='⛔ Access denied';document.getElementById('loginBtn').disabled=false;document.getElementById('loginBtn').textContent='🔐 Owner Login';return;}
+  startApp();
 }
-async function doLogout(){await SB.auth.signOut();document.getElementById('adminApp').style.display='none';document.getElementById('loginScreen').style.display='flex';}
-window.onload=async function(){const {data}=await SB.auth.getSession();if(data.session){document.getElementById('loginScreen').style.display='none';document.getElementById('adminApp').style.display='block';document.getElementById('adminEmail').textContent=data.session.user.email;loadAll();}};
+async function doLogout(){await SB.auth.signOut();document.getElementById('adminApp').style.display='none';document.getElementById('loginWrap').style.display='flex';}
+window.onload=async()=>{
+  const {data}=await SB.auth.getSession();
+  if(data.session&&data.session.user.email===ADMIN_EMAIL){startApp();}
+};
 
-// LOAD
+async function startApp(){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('adminApp').style.display='block';
+  document.getElementById('ovDate').textContent='Today: '+new Date().toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  // Message target toggle
+  document.getElementById('msgTarget').onchange=function(){document.getElementById('specificUserDiv').style.display=this.value==='one'?'block':'none';};
+  await loadAll();
+}
+
 async function loadAll(){
   const [{data:u},{data:q}]=await Promise.all([
     SB.from('profiles').select('*').order('created_at',{ascending:false}),
     SB.from('quotes').select('*').order('created_at',{ascending:false})
   ]);
-  allUsers=u||[];allQuotes=q||[];
-  renderOverview();renderRevenue();renderAnalytics();renderUsers();renderMessages();populateUserSelect();loadSentMessages();
+  AU=u||[];AQ=q||[];
+  renderOverview();renderRevenue();renderAnalytics();renderUsers();renderAllQuotes();populateUserSel();loadSentMsgs();
 }
 
 // TABS
 function showTab(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  const idx={overview:0,revenue:1,analytics:2,users:3,messages:4}[name];
-  document.querySelectorAll('.tab')[idx].classList.add('active');
+  const idx={overview:0,revenue:1,analytics:2,users:3,allquotes:4,messages:5}[name];
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
 }
 
 // OVERVIEW
 function renderOverview(){
   const today=new Date().toDateString();
-  const todayQ=allQuotes.filter(q=>new Date(q.created_at).toDateString()===today).length;
-  const paid=allUsers.filter(u=>u.plan==='pro'||u.plan==='business').length;
-  document.getElementById('ovUsers').textContent=allUsers.length;
-  document.getElementById('ovQuotes').textContent=allQuotes.length;
+  const todayQ=AQ.filter(q=>new Date(q.created_at).toDateString()===today).length;
+  const paid=AU.filter(u=>u.plan==='pro'||u.plan==='business').length;
+  document.getElementById('ovUsers').textContent=AU.length;
+  document.getElementById('ovQuotes').textContent=AQ.length;
   document.getElementById('ovPaid').textContent=paid;
   document.getElementById('ovToday').textContent=todayQ;
-  const plans={free:0,pro:0,business:0};
-  allUsers.forEach(u=>plans[u.plan||'free']=(plans[u.plan||'free']||0)+1);
-  const max=Math.max(...Object.values(plans),1);
-  const colors={free:'#f97316',pro:'#818cf8',business:'#4ade80'};
-  document.getElementById('planChart').innerHTML=Object.entries(plans).map(([plan,count])=>`
+  // Plan chart
+  const plans={free:0,pro:0,business:0};AU.forEach(u=>plans[u.plan||'free']=(plans[u.plan||'free']||0)+1);
+  const maxP=Math.max(...Object.values(plans),1);
+  const clrs={free:'#f97316',pro:'#818cf8',business:'#4ade80'};
+  document.getElementById('planChart').innerHTML=Object.entries(plans).map(([p,c])=>`
     <div class="bar-row">
-      <div class="bar-label">${plan.charAt(0).toUpperCase()+plan.slice(1)}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/max*100)}%;background:${colors[plan]}">${count}</div></div>
-      <div class="bar-val">${count} users</div>
+      <div class="bar-lbl">${p.charAt(0).toUpperCase()+p.slice(1)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(4,Math.round(c/maxP*100))}%;background:${clrs[p]};">${c}</div></div>
+      <div class="bar-num">${c} users</div>
     </div>`).join('');
-  document.getElementById('recentSignups').innerHTML=allUsers.slice(0,5).map(u=>`
-    <div style="padding:11px 16px;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;">
-      <div><div style="font-weight:700;font-size:13px;">${u.company_name||'—'}</div><div style="font-size:11px;color:#64748b;">${u.phone||''} | Joined: ${new Date(u.created_at).toLocaleDateString('en-IN')}</div></div>
-      <span class="plan-badge plan-${u.plan||'free'}">${(u.plan||'free').toUpperCase()}</span>
+  // Recent signups
+  document.getElementById('signupCount').textContent=AU.length+' total';
+  document.getElementById('recentSignups').innerHTML=AU.slice(0,5).map(u=>`
+    <div style="padding:12px 16px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-weight:700;font-size:13px;">${u.company_name||'—'}</div>
+        <div style="font-size:11px;color:#6b7280;">${u.phone||'—'} • ${fmtDate(u.created_at)}</div>
+        <div style="font-size:11px;color:#6b7280;">${AQ.filter(q=>q.user_id===u.id).length} quotes generated</div>
+      </div>
+      <span class="badge b-${u.plan||'free'}">${(u.plan||'free').toUpperCase()}</span>
     </div>`).join('');
+  // Recent quotes
+  document.getElementById('recentQuotes').innerHTML=AQ.slice(0,5).map(q=>{
+    const u=AU.find(x=>x.id===q.user_id);
+    return`<div style="padding:12px 16px;border-bottom:1px solid #1f2937;">
+      <div style="display:flex;justify-content:space-between;">
+        <div style="font-weight:700;font-size:13px;">${q.customer_name||'—'}</div>
+        <div style="font-size:13px;font-weight:800;color:#ff6b00;">${q.system_kwp} kWp</div>
+      </div>
+      <div style="font-size:11px;color:#6b7280;">${q.customer_state} • ${fmtDate(q.created_at)} • by ${u?.company_name||'Unknown'}</div>
+      <div style="font-size:12px;font-weight:700;color:#4ade80;margin-top:3px;">${inr(q.net_cost)}</div>
+    </div>`;}).join('');
 }
 
 // REVENUE
 function renderRevenue(){
-  const proCnt=allUsers.filter(u=>u.plan==='pro').length;
-  const bizCnt=allUsers.filter(u=>u.plan==='business').length;
-  const mrr=proCnt*799+bizCnt*1999;
-  const arr=mrr*12;
+  const pro=AU.filter(u=>u.plan==='pro').length;
+  const biz=AU.filter(u=>u.plan==='business').length;
+  const free=AU.filter(u=>!u.plan||u.plan==='free').length;
+  const mrr=pro*799+biz*1999;
   document.getElementById('revMRR').textContent=inr(mrr);
-  document.getElementById('revARR').textContent=inr(arr);
-  document.getElementById('revPro').textContent=proCnt;
-  document.getElementById('revBiz').textContent=bizCnt;
-  const freeCnt=allUsers.filter(u=>!u.plan||u.plan==='free').length;
-  document.getElementById('revenueBreakdown').innerHTML=`
-    ${[['Free','free',freeCnt,0,'#f97316'],['Pro','pro',proCnt,799,'#818cf8'],['Business','business',bizCnt,1999,'#4ade80']].map(([label,plan,cnt,price,clr])=>`
-    <div class="revenue-row">
-      <div><span class="plan-badge plan-${plan}">${label.toUpperCase()}</span><span style="font-size:12px;color:#64748b;margin-left:8px;">${cnt} users × ${inr(price)}/mo</span></div>
-      <div style="font-size:14px;font-weight:800;color:${clr};">${inr(cnt*price)}</div>
-    </div>`).join('')}
-    <div class="revenue-row" style="background:#0f172a;">
-      <div style="font-weight:800;font-size:14px;">Total MRR</div>
-      <div style="font-size:16px;font-weight:800;color:#4ade80;">${inr(mrr)}</div>
-    </div>`;
-  const convRates=[10,20,30,50];
-  document.getElementById('growthPotential').innerHTML=convRates.map(pct=>{
-    const converts=Math.round(freeCnt*pct/100);
-    const addMrr=converts*799;
-    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #334155;">
-      <div style="font-size:12px;color:#94a3b8;">${pct}% convert (${converts} users)</div>
-      <div style="font-weight:800;color:#4ade80;">+${inr(addMrr)}/mo</div>
-    </div>`;
-  }).join('');
+  document.getElementById('revARR').textContent=inr(mrr*12);
+  document.getElementById('revPro').textContent=pro;
+  document.getElementById('revBiz').textContent=biz;
+  document.getElementById('revBreakdown').innerHTML=`
+    <div class="rev-row"><div><span class="badge b-free">FREE</span><span style="font-size:12px;color:#6b7280;margin-left:8px;">${free} × ₹0</span></div><div style="font-weight:700;color:#6b7280;">₹0</div></div>
+    <div class="rev-row"><div><span class="badge b-pro">PRO</span><span style="font-size:12px;color:#6b7280;margin-left:8px;">${pro} × ₹799/mo</span></div><div style="font-weight:700;color:#818cf8;">${inr(pro*799)}</div></div>
+    <div class="rev-row"><div><span class="badge b-business">BUSINESS</span><span style="font-size:12px;color:#6b7280;margin-left:8px;">${biz} × ₹1999/mo</span></div><div style="font-weight:700;color:#4ade80;">${inr(biz*1999)}</div></div>
+    <div class="rev-row total"><div style="font-weight:800;font-size:15px;">Total MRR</div><div style="font-size:18px;font-weight:800;color:#4ade80;">${inr(mrr)}</div></div>`;
+  document.getElementById('growthCalc').innerHTML=[10,20,30,50].map(pct=>{
+    const n=Math.round(free*pct/100);
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1f2937;">
+      <div style="font-size:12px;color:#9ca3af;">${pct}% convert (${n} users)</div>
+      <div style="font-weight:800;color:#4ade80;">+${inr(n*799)}/mo</div>
+    </div>`;}).join('');
 }
 
 // ANALYTICS
 function renderAnalytics(){
-  // State chart
-  const states={};allQuotes.forEach(q=>{const s=q.customer_state||'Unknown';states[s]=(states[s]||0)+1;});
-  const sortedStates=Object.entries(states).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const maxS=Math.max(...sortedStates.map(x=>x[1]),1);
-  document.getElementById('stateChart').innerHTML=sortedStates.map(([s,c])=>`
-    <div class="bar-row"><div class="bar-label">${s.slice(0,9)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c/maxS*100)}%;background:#ff6b00">${c}</div></div><div class="bar-val">${c} quotes</div></div>`).join('') || '<div class="empty">No data yet</div>';
-
-  // Size chart
-  const sizes={'1-3 kWp':0,'3-5 kWp':0,'5-10 kWp':0,'10+ kWp':0};
-  allQuotes.forEach(q=>{const k=q.system_kwp||0;if(k<=3)sizes['1-3 kWp']++;else if(k<=5)sizes['3-5 kWp']++;else if(k<=10)sizes['5-10 kWp']++;else sizes['10+ kWp']++;});
-  const maxSz=Math.max(...Object.values(sizes),1);
-  const szColors={'1-3 kWp':'#fbbf24','3-5 kWp':'#f97316','5-10 kWp':'#ff6b00','10+ kWp':'#ea580c'};
-  document.getElementById('sizeChart').innerHTML=Object.entries(sizes).map(([s,c])=>`
-    <div class="bar-row"><div class="bar-label">${s}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c/maxSz*100)}%;background:${szColors[s]}">${c}</div></div><div class="bar-val">${c} quotes</div></div>`).join('');
-
-  // Status chart
-  const statuses={sent:0,followup:0,closed:0,lost:0};
-  allQuotes.forEach(q=>statuses[q.status||'sent']=(statuses[q.status||'sent']||0)+1);
-  const maxSt=Math.max(...Object.values(statuses),1);
-  const stColors={sent:'#818cf8',followup:'#fbbf24',closed:'#4ade80',lost:'#f87171'};
-  const stLabels={sent:'📤 Sent',followup:'🔔 Follow-up',closed:'✅ Closed',lost:'❌ Lost'};
-  document.getElementById('statusChart').innerHTML=Object.entries(statuses).map(([s,c])=>`
-    <div class="bar-row"><div class="bar-label" style="width:70px;">${stLabels[s]}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c/maxSt*100)}%;background:${stColors[s]}">${c}</div></div><div class="bar-val">${c}</div></div>`).join('');
-
-  // Week chart
+  const today=new Date();
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const now=new Date();const weekData=Array(7).fill(0);
-  allQuotes.forEach(q=>{const d=new Date(q.created_at);const diff=Math.floor((now-d)/(1000*60*60*24));if(diff<7)weekData[6-diff]++;});
+  const weekData=Array(7).fill(0);
+  AQ.forEach(q=>{const d=new Date(q.created_at);const diff=Math.floor((today-d)/(864e5));if(diff<7)weekData[6-diff]++;});
   const maxW=Math.max(...weekData,1);
-  const weekDays=Array(7).fill(0).map((_,i)=>{const d=new Date(now);d.setDate(d.getDate()-(6-i));return days[d.getDay()];});
-  document.getElementById('weekChart').innerHTML=weekData.map((c,i)=>`<div class="mini-bar" style="height:${Math.max(4,Math.round(c/maxW*50))}px;background:${i===6?'#ff6b00':'#334155'};"></div>`).join('');
-  document.getElementById('weekLabels').innerHTML=weekDays.map(d=>`<span>${d}</span>`).join('');
-
-  // Summary stats
-  const avgKwp=allQuotes.length?allQuotes.reduce((a,q)=>a+(q.system_kwp||0),0)/allQuotes.length:0;
-  const avgVal=allQuotes.length?allQuotes.reduce((a,q)=>a+(q.net_cost||0),0)/allQuotes.length:0;
-  const totalPipe=allQuotes.filter(q=>q.status==='sent'||q.status==='followup').reduce((a,q)=>a+(q.net_cost||0),0);
-  document.getElementById('avgKwp').textContent=avgKwp?avgKwp.toFixed(1)+' kWp':'—';
-  document.getElementById('avgVal').textContent=avgVal?inr(avgVal):'—';
-  document.getElementById('totalPipe').textContent=totalPipe?inr(totalPipe):'—';
-  document.getElementById('closedWon').textContent=allQuotes.filter(q=>q.status==='closed').length;
+  const wDays=Array(7).fill(0).map((_,i)=>{const d=new Date(today);d.setDate(d.getDate()-(6-i));return days[d.getDay()];});
+  document.getElementById('weekBars').innerHTML=weekData.map((c,i)=>`<div class="week-bar" style="height:${Math.max(4,Math.round(c/maxW*60))}px;background:${i===6?'#ff6b00':'#1f2937'};"></div>`).join('');
+  document.getElementById('weekDays').innerHTML=wDays.map(d=>`<div class="week-day">${d}</div>`).join('');
+  // Stats
+  const avgKwp=AQ.length?(AQ.reduce((a,q)=>a+(q.system_kwp||0),0)/AQ.length).toFixed(1)+'kWp':'—';
+  const avgVal=AQ.length?inr(AQ.reduce((a,q)=>a+(q.net_cost||0),0)/AQ.length):'—';
+  const pipe=AQ.filter(q=>q.status==='sent'||q.status==='followup').reduce((a,q)=>a+(q.net_cost||0),0);
+  document.getElementById('avgKwp').textContent=avgKwp;
+  document.getElementById('avgVal').textContent=avgVal;
+  document.getElementById('pipeVal').textContent=inr(pipe);
+  document.getElementById('wonDeals').textContent=AQ.filter(q=>q.status==='closed').length;
+  // State chart
+  const states={};AQ.forEach(q=>{const s=q.customer_state||'Unknown';states[s]=(states[s]||0)+1;});
+  const topStates=Object.entries(states).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxS=Math.max(...topStates.map(x=>x[1]),1);
+  document.getElementById('stateChart').innerHTML=topStates.length?topStates.map(([s,c])=>`
+    <div class="bar-row"><div class="bar-lbl">${s.slice(0,10)}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(4,Math.round(c/maxS*100))}%;background:#ff6b00;">${c}</div></div><div class="bar-num">${c}</div></div>`).join(''):'<div class="empty">No quote data yet</div>';
+  // Size
+  const sz={'1-3kWp':0,'3-5kWp':0,'5-10kWp':0,'10+kWp':0};
+  AQ.forEach(q=>{const k=q.system_kwp||0;if(k<=3)sz['1-3kWp']++;else if(k<=5)sz['3-5kWp']++;else if(k<=10)sz['5-10kWp']++;else sz['10+kWp']++;});
+  const maxSz=Math.max(...Object.values(sz),1);
+  const szC={'1-3kWp':'#fbbf24','3-5kWp':'#f97316','5-10kWp':'#ff6b00','10+kWp':'#ea580c'};
+  document.getElementById('sizeChart').innerHTML=Object.entries(sz).map(([s,c])=>`
+    <div class="bar-row"><div class="bar-lbl">${s}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(4,Math.round(c/maxSz*100))}%;background:${szC[s]};">${c}</div></div><div class="bar-num">${c}</div></div>`).join('');
+  // Status
+  const st={sent:0,followup:0,closed:0,lost:0};AQ.forEach(q=>st[q.status||'sent']=(st[q.status||'sent']||0)+1);
+  const maxSt=Math.max(...Object.values(st),1);
+  const stC={sent:'#818cf8',followup:'#fbbf24',closed:'#4ade80',lost:'#f87171'};
+  const stL={sent:'📤 Sent',followup:'🔔 Followup',closed:'✅ Closed',lost:'❌ Lost'};
+  document.getElementById('statusChart').innerHTML=Object.entries(st).map(([s,c])=>`
+    <div class="bar-row"><div class="bar-lbl" style="width:80px;">${stL[s]}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(4,Math.round(c/maxSt*100))}%;background:${stC[s]};">${c}</div></div><div class="bar-num">${c}</div></div>`).join('');
 }
 
 // USERS
 function renderUsers(filter=''){
-  const filtered=filter?allUsers.filter(u=>(u.company_name||'').toLowerCase().includes(filter.toLowerCase())||(u.phone||'').includes(filter)):allUsers;
-  document.getElementById('userCount').textContent=filtered.length+' users';
-  if(!filtered.length){document.getElementById('userList').innerHTML='<div class="empty">No users found</div>';return;}
-  document.getElementById('userList').innerHTML=filtered.map(u=>{
-    const qCnt=allQuotes.filter(q=>q.user_id===u.id).length;
-    const rev=PLANS[u.plan||'free'].price;
-    return`<div class="user-item">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
-        <div>
-          <div style="font-weight:700;font-size:14px;">${u.company_name||'No Company'}</div>
-          <div style="font-size:11px;color:#64748b;margin-top:2px;">${u.phone||'—'} • ${qCnt} quotes • Joined ${new Date(u.created_at).toLocaleDateString('en-IN')}</div>
-          ${rev>0?`<div style="font-size:11px;color:#4ade80;margin-top:2px;font-weight:700;">💰 ${inr(rev)}/mo</div>`:''}
+  const f=filter.toLowerCase();
+  const list=f?AU.filter(u=>(u.company_name||'').toLowerCase().includes(f)||(u.phone||'').includes(f)):AU;
+  document.getElementById('userCount').textContent=list.length+' users';
+  if(!list.length){document.getElementById('userList').innerHTML='<div class="empty">No users found</div>';return;}
+  document.getElementById('userList').innerHTML=list.map(u=>{
+    const qc=AQ.filter(q=>q.user_id===u.id).length;
+    const rev=PRICES[u.plan||'free'];
+    const plan=u.plan||'free';
+    const exp=u.subscription_expires_at?new Date(u.subscription_expires_at):null;
+    const now=new Date();
+    const daysLeft=exp?Math.ceil((exp-now)/(1000*60*60*24)):null;
+    const isExpired=exp&&exp<now;
+    const expColor=isExpired?'#f87171':daysLeft<=7?'#fbbf24':'#4ade80';
+    let expiryHtml='';
+    if(plan!=='free'&&exp){
+      expiryHtml=`<br/><span style="font-size:11px;font-weight:800;color:${expColor};">
+        ${isExpired?'⚠️ EXPIRED: '+fmtDate(exp):daysLeft<=7?'⚠️ Expires in '+daysLeft+' days ('+fmtDate(exp)+')':'✅ Expires: '+fmtDate(exp)}
+      </span>`;
+    }
+    return`<div class="user-row" style="${isExpired?'border-left:3px solid #f87171;':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+        <div style="flex:1;">
+          <div class="user-name">${u.company_name||'No Company'}</div>
+          <div class="user-meta">
+            📱 ${u.phone||'—'}<br/>
+            📋 ${qc} quotes generated<br/>
+            📅 Joined: ${fmtDate(u.created_at)}<br/>
+            ${u.last_active?'🕐 Last active: '+fmtDate(u.last_active):''}
+            ${rev>0?'<br/>💰 Revenue: '+inr(rev)+'/mo':''}
+            ${expiryHtml}
+          </div>
         </div>
         <div style="text-align:right;">
-          <span class="plan-badge plan-${u.plan||'free'}">${(u.plan||'free').toUpperCase()}</span>
-          <div style="font-size:10px;color:${u.is_active!==false?'#4ade80':'#f87171'};margin-top:4px;font-weight:700;">${u.is_active!==false?'● Active':'● Inactive'}</div>
+          <span class="badge b-${plan}" style="display:block;margin-bottom:6px;">${plan.toUpperCase()}</span>
+          <span style="font-size:11px;font-weight:700;color:${u.is_active!==false?'#4ade80':'#f87171'};">${u.is_active!==false?'● Active':'● Inactive'}</span>
         </div>
       </div>
-      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
-        <select class="plan-select" onchange="changePlan('${u.id}',this.value)">
-          <option value="free" ${(!u.plan||u.plan==='free')?'selected':''}>Free</option>
-          <option value="pro" ${u.plan==='pro'?'selected':''}>Pro ₹799</option>
-          <option value="business" ${u.plan==='business'?'selected':''}>Business ₹1999</option>
+      <div class="user-actions">
+        <select class="plan-sel" onchange="changePlan('${u.id}',this.value)">
+          <option value="free" ${plan==='free'?'selected':''}>Free</option>
+          <option value="pro" ${plan==='pro'?'selected':''}>Pro ₹799</option>
+          <option value="business" ${plan==='business'?'selected':''}>Business ₹1999</option>
         </select>
-        <button class="action-btn ${u.is_active!==false?'btn-deact':'btn-act'}" onclick="toggleUser('${u.id}',${u.is_active!==false})">${u.is_active!==false?'🚫 Deactivate':'✅ Activate'}</button>
-        <button class="action-btn" style="background:#1e293b;color:#94a3b8;border:1px solid #334155;" onclick="msgUser('${u.id}','${(u.company_name||'').replace(/'/g,'')}')">📢 Message</button>
+        <button class="act-btn" style="background:#1a2a4a;color:#818cf8;" onclick="extendSub('${u.id}','${plan}')" title="Extend 1 month">+1 Month</button>
+        <button class="act-btn ${u.is_active!==false?'act-deact':'act-activ'}" onclick="toggleUser('${u.id}',${u.is_active!==false})">${u.is_active!==false?'🚫 Deact':'✅ Act'}</button>
+        <button class="act-btn act-msg" onclick="quickMsg('${u.id}')">📢 Msg</button>
       </div>
-    </div>`;
-  }).join('');
+    </div>`;}).join('');
 }
 function filterUsers(){renderUsers(document.getElementById('userSearch').value);}
-
-async function changePlan(userId,plan){
-  await SB.from('profiles').update({plan}).eq('id',userId);
-  allUsers=allUsers.map(u=>u.id===userId?{...u,plan}:u);
+async function changePlan(id,plan){
+  const now=new Date();
+  const expires=new Date(now);expires.setMonth(expires.getMonth()+1);
+  const updates={plan};
+  if(plan!=='free'){updates.subscription_started_at=now.toISOString();updates.subscription_expires_at=expires.toISOString();}
+  else{updates.subscription_started_at=null;updates.subscription_expires_at=null;}
+  await SB.from('profiles').update(updates).eq('id',id);
+  AU=AU.map(u=>u.id===id?{...u,...updates}:u);
   renderUsers(document.getElementById('userSearch').value);
-  renderOverview();renderRevenue();
-  showToast('✅ Plan → '+plan.toUpperCase());
+  renderRevenue();renderOverview();
+  showToast('✅ Plan → '+plan.toUpperCase()+(plan!=='free'?' | Expires: '+expires.toLocaleDateString('en-IN'):''));
 }
-async function toggleUser(userId,cur){
-  await SB.from('profiles').update({is_active:!cur}).eq('id',userId);
-  allUsers=allUsers.map(u=>u.id===userId?{...u,is_active:!cur}:u);
+async function extendSub(id,plan){
+  if(plan==='free'){showToast('Free plan hai — pehle upgrade karein!',false);return;}
+  const u=AU.find(x=>x.id===id);
+  const base=u?.subscription_expires_at&&new Date(u.subscription_expires_at)>new Date()?new Date(u.subscription_expires_at):new Date();
+  const newExp=new Date(base);newExp.setMonth(newExp.getMonth()+1);
+  await SB.from('profiles').update({subscription_expires_at:newExp.toISOString()}).eq('id',id);
+  AU=AU.map(x=>x.id===id?{...x,subscription_expires_at:newExp.toISOString()}:x);
   renderUsers(document.getElementById('userSearch').value);
-  showToast(!cur?'✅ Activated!':'🚫 Deactivated!',!cur);
+  showToast('✅ +1 Month! New expiry: '+newExp.toLocaleDateString('en-IN'));
+}
+async function toggleUser(id,cur){
+  await SB.from('profiles').update({is_active:!cur}).eq('id',id);
+  AU=AU.map(u=>u.id===id?{...u,is_active:!cur}:u);
+  renderUsers(document.getElementById('userSearch').value);
+  showToast(!cur?'✅ User activated!':'🚫 User deactivated!',!cur);
+}
+function quickMsg(uid){showTab('messages');document.getElementById('msgTarget').value='one';document.getElementById('specificUserDiv').style.display='block';document.getElementById('msgUser').value=uid;}
+
+// ALL QUOTES
+function renderAllQuotes(){
+  document.getElementById('qtotal').textContent=AQ.length+' quotes';
+  if(!AQ.length){document.getElementById('allQuotesList').innerHTML='<div class="empty">No quotes yet</div>';return;}
+  const sl={sent:'📤',followup:'🔔',closed:'✅',lost:'❌'};
+  document.getElementById('allQuotesList').innerHTML=AQ.map(q=>{
+    const u=AU.find(x=>x.id===q.user_id);
+    return`<div class="q-row">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:700;font-size:13px;">${q.customer_name||'—'}</div>
+        <div style="font-size:13px;font-weight:800;color:#ff6b00;">${q.system_kwp} kWp</div>
+      </div>
+      <div style="font-size:11px;color:#6b7280;margin-top:2px;">${q.quote_number||'—'} • ${q.customer_state} • ${fmtDate(q.created_at)}</div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:1px;">By: ${u?.company_name||'Unknown'} ${sl[q.status||'sent']} ${q.status||'sent'}</div>
+      <div style="display:flex;gap:14px;margin-top:6px;">
+        <div><div style="font-size:12px;font-weight:700;">${inr(q.net_cost)}</div><div style="font-size:10px;color:#6b7280;">Cost</div></div>
+        <div><div style="font-size:12px;font-weight:700;color:#4ade80;">${inr(q.annual_savings)}/yr</div><div style="font-size:10px;color:#6b7280;">Savings</div></div>
+        <div><div style="font-size:11px;font-weight:700;color:#fbbf24;">${q.payback_years}yr PB</div><div style="font-size:10px;color:#6b7280;">Payback</div></div>
+      </div>
+    </div>`;}).join('');
 }
 
 // MESSAGES
-function populateUserSelect(){
-  const sel=document.getElementById('msgUser');
-  sel.innerHTML='<option value="">-- Select User --</option>'+allUsers.map(u=>`<option value="${u.id}">${u.company_name||'User'} (${u.plan||'free'})</option>`).join('');
+function populateUserSel(){
+  document.getElementById('msgUser').innerHTML='<option value="">-- Select User --</option>'+AU.map(u=>`<option value="${u.id}">${u.company_name||'User'} (${u.plan||'free'})</option>`).join('');
 }
-
-function msgUser(userId,name){
-  showTab('messages');
-  document.getElementById('msgUser').value=userId;
-  document.getElementById('msgAll').value='';
-  document.getElementById('msgSubject').value='';
-  document.getElementById('msgBody').value='';
-  document.getElementById('msgSubject').focus();
-}
-
-let pendingMsg=null;
-function sendMessage(){
-  const userId=document.getElementById('msgUser').value;
-  const allTarget=document.getElementById('msgAll').value;
-  const subject=document.getElementById('msgSubject').value.trim();
+let pendMsg=null;
+function previewMsg(){
+  const target=document.getElementById('msgTarget').value;
+  const uid=document.getElementById('msgUser').value;
+  const subj=document.getElementById('msgSubject').value.trim();
   const body=document.getElementById('msgBody').value.trim();
-  if(!subject||!body){showToast('Subject & message required!',false);return;}
-  if(!userId&&!allTarget){showToast('Select user or target group!',false);return;}
-  let targetLabel='';
-  if(allTarget==='all')targetLabel='ALL Users ('+allUsers.length+')';
-  else if(allTarget==='free')targetLabel='Free Users ('+allUsers.filter(u=>!u.plan||u.plan==='free').length+')';
-  else if(allTarget==='pro')targetLabel='Pro Users ('+allUsers.filter(u=>u.plan==='pro').length+')';
-  else if(allTarget==='business')targetLabel='Business Users ('+allUsers.filter(u=>u.plan==='business').length+')';
-  else{const u=allUsers.find(x=>x.id===userId);targetLabel=u?.company_name||'User';}
-  pendingMsg={userId,allTarget,subject,body,targetLabel};
-  document.getElementById('msgPreview').innerHTML=`
-    <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="font-size:11px;color:#64748b;margin-bottom:6px;">TO: <b style="color:#e2e8f0;">${targetLabel}</b></div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:4px;">SUBJECT:</div>
-      <div style="font-weight:700;font-size:14px;margin-bottom:8px;">${subject}</div>
-      <div style="font-size:13px;color:#94a3b8;line-height:1.6;">${body}</div>
-    </div>`;
-  document.getElementById('msgModal').classList.add('show');
-}
-
-async function confirmSend(){
-  if(!pendingMsg)return;
-  document.getElementById('msgModal').classList.remove('show');
+  if(!subj||!body){showToast('Subject & message required!',false);return;}
   let targets=[];
-  if(pendingMsg.allTarget==='all')targets=allUsers.map(u=>u.id);
-  else if(pendingMsg.allTarget==='free')targets=allUsers.filter(u=>!u.plan||u.plan==='free').map(u=>u.id);
-  else if(pendingMsg.allTarget==='pro')targets=allUsers.filter(u=>u.plan==='pro').map(u=>u.id);
-  else if(pendingMsg.allTarget==='business')targets=allUsers.filter(u=>u.plan==='business').map(u=>u.id);
-  else targets=[pendingMsg.userId];
-
-  // Save to admin_messages table
-  try{
-    const rows=targets.map(uid=>({user_id:uid,subject:pendingMsg.subject,body:pendingMsg.body}));
-    await SB.from('admin_messages').insert(rows);
-    showToast('✅ Sent to '+targets.length+' user(s)!');
-    document.getElementById('msgSubject').value='';
-    document.getElementById('msgBody').value='';
-    loadSentMessages();
-  }catch(e){
-    showToast('Error! Create admin_messages table first.',false);
-  }
-  pendingMsg=null;
+  if(target==='all')targets=AU.map(u=>u.id);
+  else if(target==='free')targets=AU.filter(u=>!u.plan||u.plan==='free').map(u=>u.id);
+  else if(target==='pro')targets=AU.filter(u=>u.plan==='pro').map(u=>u.id);
+  else if(target==='business')targets=AU.filter(u=>u.plan==='business').map(u=>u.id);
+  else if(target==='one'){if(!uid){showToast('Select a user!',false);return;}targets=[uid];}
+  if(!targets.length){showToast('No users in this group!',false);return;}
+  pendMsg={targets,subj,body,target};
+  document.getElementById('modalPreview').innerHTML=`<b>TO:</b> ${target==='one'?AU.find(u=>u.id===uid)?.company_name||'User':target.charAt(0).toUpperCase()+target.slice(1)+' ('+targets.length+' users)'}<br/><br/><b>SUBJECT:</b> ${subj}<br/><br/>${body}`;
+  document.getElementById('confirmModal').classList.add('show');
 }
-
-async function loadSentMessages(){
+async function confirmSend(){
+  if(!pendMsg)return;
+  document.getElementById('confirmModal').classList.remove('show');
   try{
-    const {data:msgs}=await SB.from('admin_messages').select('*').order('created_at',{ascending:false}).limit(20);
-    if(!msgs||!msgs.length){document.getElementById('sentMessages').innerHTML='<div class="empty">No messages sent yet</div>';return;}
-    document.getElementById('sentMessages').innerHTML=msgs.map(m=>`
-      <div style="padding:12px 16px;border-bottom:1px solid #334155;">
+    await SB.from('admin_messages').insert(pendMsg.targets.map(uid=>({user_id:uid,subject:pendMsg.subj,body:pendMsg.body})));
+    showToast('✅ Sent to '+pendMsg.targets.length+' user(s)!');
+    document.getElementById('msgSubject').value='';document.getElementById('msgBody').value='';
+    loadSentMsgs();
+  }catch(e){showToast('Error! Check admin_messages table.',false);}
+  pendMsg=null;
+}
+async function loadSentMsgs(){
+  try{
+    const {data}=await SB.from('admin_messages').select('*, profiles(company_name)').order('created_at',{ascending:false}).limit(20);
+    if(!data||!data.length){document.getElementById('sentMsgs').innerHTML='<div class="empty">No messages sent yet</div>';return;}
+    document.getElementById('sentMsgs').innerHTML=data.map(m=>`
+      <div class="sent-msg">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div style="font-weight:700;font-size:13px;">${m.subject}</div>
-          <div style="font-size:10px;color:#64748b;">${new Date(m.created_at).toLocaleDateString('en-IN')}</div>
+          <div style="font-size:10px;color:#6b7280;">${fmtDate(m.created_at)}</div>
         </div>
-        <div style="font-size:12px;color:#64748b;margin-top:4px;">${m.body.slice(0,80)}${m.body.length>80?'...':''}</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:3px;">To: ${m.profiles?.company_name||'User'}</div>
+        <div style="font-size:12px;color:#9ca3af;margin-top:4px;">${m.body.slice(0,100)}${m.body.length>100?'...':''}</div>
       </div>`).join('');
-  }catch(e){document.getElementById('sentMessages').innerHTML='<div class="empty">Create admin_messages table to use this feature</div>';}
+  }catch(e){document.getElementById('sentMsgs').innerHTML='<div class="empty">Run new_tables.sql first</div>';}
 }
-
-function renderMessages(){populateUserSelect();}
 </script>
 </body>
 </html>
