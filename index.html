@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SolarQuote Pro</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -12,7 +11,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh
 input,select,textarea,button{font-family:inherit;}
 .auth-screen{min-height:100vh;background:linear-gradient(135deg,#0d2060,#1a3370);display:flex;align-items:center;justify-content:center;padding:20px;}
 .auth-box{background:white;border-radius:20px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-.auth-logo{text-align:center;margin-bottom:24px;}
 .sun{width:52px;height:52px;background:#ff6b00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 0 20px rgba(255,107,0,0.4);}
 .auth-tabs{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid #eee;margin-bottom:20px;}
 .auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;background:#fafafa;color:#888;border:none;}
@@ -20,8 +18,8 @@ input,select,textarea,button{font-family:inherit;}
 .field{margin-bottom:14px;}
 .field label{font-size:12px;color:#666;font-weight:600;display:block;margin-bottom:5px;}
 .field input,.field select,.field textarea{width:100%;padding:11px 13px;border-radius:9px;border:1.5px solid #ddd;font-size:14px;outline:none;background:#fafafa;}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:#ff6b00;}
-.btn-primary{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,0,0.3);margin-top:4px;}
+.field input:focus,.field select:focus{border-color:#ff6b00;}
+.btn-primary{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,0,0.3);}
 .btn-primary:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
 .msg{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:12px;display:none;}
 .msg.ok{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;display:block;}
@@ -30,12 +28,8 @@ input,select,textarea,button{font-family:inherit;}
 nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.07);position:sticky;top:0;z-index:100;}
 .nav-logo{display:flex;align-items:center;gap:10px;}
 .nav-sun{width:34px;height:34px;background:#ff6b00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;}
-.nav-title{font-weight:800;color:#1a3370;font-size:15px;line-height:1.1;}
-.nav-sub{font-size:10px;color:#888;}
-.nav-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;}
-.nav-btn.outline{background:white;border:1.5px solid #ddd;color:#444;}
 .tabs{display:flex;background:white;border-bottom:1px solid #eee;overflow-x:auto;}
-.tab{padding:11px 16px;font-size:12px;font-weight:700;color:#888;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;}
+.tab{padding:11px 14px;font-size:12px;font-weight:700;color:#888;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;}
 .tab.active{color:#ff6b00;border-bottom-color:#ff6b00;}
 .card{background:white;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:14px;}
 .sec-title{font-size:10px;font-weight:800;color:#ff6b00;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
@@ -46,9 +40,9 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 .finp input,.finp select,.finp textarea{width:100%;padding:10px 11px;border-radius:8px;border:1.5px solid #ddd;font-size:13px;outline:none;background:#fafafa;}
 .finp input:focus,.finp select:focus,.finp textarea:focus{border-color:#ff6b00;background:white;}
 .finp textarea{resize:none;}
-.finp .err{font-size:11px;color:#f55;margin-top:3px;display:none;}
+.finp .err-msg{font-size:11px;color:#f55;margin-top:3px;display:none;}
 .finp.has-err input,.finp.has-err select,.finp.has-err textarea{border-color:#f55;background:#fff5f5;}
-.finp.has-err .err{display:block;}
+.finp.has-err .err-msg{display:block;}
 .seg{display:flex;border-radius:8px;overflow:hidden;border:1.5px solid #ddd;}
 .seg button{flex:1;padding:9px 4px;font-size:11px;font-weight:700;border:none;cursor:pointer;background:#fafafa;color:#888;}
 .seg button.active{background:#ff6b00;color:white;}
@@ -90,114 +84,108 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 .page.active{display:block;}
 .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;padding:11px 20px;border-radius:12px;font-weight:700;font-size:13px;color:white;display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
 .toast.show{display:block;}
-.reminder-item{padding:12px 14px;background:#fff8f0;border-radius:10px;border:1px solid #ffe4c4;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
-.notif-dot{width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:4px;animation:pulse 1.5s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
 .modal-overlay.show{display:flex;}
 .modal{background:white;border-radius:18px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
-.modal h3{font-size:16px;font-weight:800;color:#1a3370;margin-bottom:16px;}
-.admin-msg{background:#f0f4ff;border:1px solid #c7d7ff;border-radius:10px;padding:12px 14px;margin-bottom:10px;}
-.admin-msg-title{font-size:11px;font-weight:800;color:#1a3370;margin-bottom:4px;}
-.admin-msg-body{font-size:13px;color:#444;}
-.admin-msg-date{font-size:10px;color:#aaa;margin-top:4px;}
+.notif-dot{width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:3px;vertical-align:top;}
+.admin-msg-card{background:#f0f4ff;border:1.5px solid #c7d7ff;border-radius:12px;padding:14px;margin-bottom:14px;}
+.reminder-item{padding:12px 14px;background:#fff8f0;border-radius:10px;border:1px solid #ffe4c4;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.clr-swatch{width:34px;height:34px;border-radius:8px;cursor:pointer;border:3px solid transparent;flex-shrink:0;}
+.clr-swatch.selected{border-color:#ff6b00 !important;}
 @media(max-width:400px){.grid2{grid-template-columns:1fr;}.gen-btns{flex-direction:column;}}
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
 <div class="auth-screen" id="authScreen">
   <div class="auth-box">
-    <div class="auth-logo">
+    <div style="text-align:center;margin-bottom:24px;">
       <div class="sun">☀</div>
       <h2 style="font-size:20px;color:#1a3370;font-weight:800;">SolarQuote Pro</h2>
       <p style="font-size:12px;color:#888;margin-top:2px;" id="authSub">Sign in to continue</p>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuth('login')">Login</button>
-      <button class="auth-tab" onclick="switchAuth('signup')">Sign Up</button>
+      <button class="auth-tab" onclick="switchAuth('signup')">Sign Up Free</button>
     </div>
     <div id="authMsg" class="msg"></div>
     <div id="signupExtra" style="display:none;">
-      <div class="field"><label>Company Name</label><input id="aCompany" placeholder="ABC Solar Pvt Ltd"/></div>
+      <div class="field"><label>Company / Your Name</label><input id="aCompany" placeholder="ABC Solar Pvt Ltd"/></div>
       <div class="field"><label>Phone</label><input id="aPhone" placeholder="+91-98765-43210"/></div>
     </div>
     <div class="field"><label>Email</label><input type="email" id="aEmail" placeholder="you@example.com"/></div>
     <div class="field"><label>Password</label><input type="password" id="aPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/></div>
     <button class="btn-primary" id="authBtn" onclick="doAuth()">Login</button>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:#aaa;">☁️ Data syncs across all devices</div>
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:#aaa;">☁️ Secure cloud sync • All devices</div>
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div class="app" id="mainApp">
   <nav>
     <div class="nav-logo">
       <div class="nav-sun">☀</div>
       <div>
-        <div class="nav-title">SolarQuote Pro</div>
-        <div class="nav-sub" id="navName">...</div>
+        <div style="font-weight:800;color:#1a3370;font-size:14px;">SolarQuote Pro</div>
+        <div style="font-size:10px;color:#888;" id="navName">...</div>
       </div>
     </div>
     <div style="display:flex;gap:6px;">
-      <button class="nav-btn outline" onclick="showPage('reminders')" style="position:relative;">
-        🔔<span id="reminderDot" class="notif-dot" style="display:none;position:absolute;top:4px;right:4px;"></span>
+      <button onclick="showPage('reminders')" style="padding:7px 10px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-size:13px;position:relative;">
+        🔔<span id="reminderDot" class="notif-dot" style="display:none;"></span>
       </button>
-      <button class="nav-btn outline" onclick="showPage('settings')">⚙</button>
-      <button class="nav-btn outline" onclick="doLogout()">Exit</button>
+      <button onclick="showPage('settings')" style="padding:7px 10px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-size:13px;">⚙</button>
+      <button onclick="doLogout()" style="padding:7px 12px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-size:12px;font-weight:700;color:#666;">Exit</button>
     </div>
   </nav>
   <div class="tabs">
     <button class="tab active" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="tab" onclick="showPage('quote')">+ Quote</button>
+    <button class="tab" onclick="showPage('quote')">+ New Quote</button>
     <button class="tab" onclick="showPage('reminders')">🔔 Followups</button>
     <button class="tab" onclick="showPage('template')">🎨 Template</button>
-    <button class="tab" onclick="showPage('settings')">⚙</button>
+    <button class="tab" onclick="showPage('settings')">⚙ Settings</button>
   </div>
 
   <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
-    <div style="max-width:600px;margin:0 auto;">
-      <!-- Admin messages -->
-      <div id="adminMsgs"></div>
+    <div style="max-width:620px;margin:0 auto;">
+      <div id="adminMsgArea"></div>
       <div class="stat-grid">
-        <div class="stat-box"><div class="stat-label">Total Quotes</div><div class="stat-val" id="stTotal" style="color:#ff6b00">-</div></div>
-        <div class="stat-box"><div class="stat-label">This Month</div><div class="stat-val" id="stMonth" style="color:#1a3370">-</div></div>
-        <div class="stat-box"><div class="stat-label">Total Value</div><div class="stat-val" id="stValue" style="color:#22c55e;font-size:14px">-</div></div>
-        <div class="stat-box"><div class="stat-label">Plan</div><div class="stat-val" id="stPlan" style="font-size:13px">-</div></div>
+        <div class="stat-box"><div class="stat-label">Total Quotes</div><div class="stat-val" id="stTotal" style="color:#ff6b00">—</div></div>
+        <div class="stat-box"><div class="stat-label">This Month</div><div class="stat-val" id="stMonth" style="color:#1a3370">—</div></div>
+        <div class="stat-box"><div class="stat-label">Total Value</div><div class="stat-val" id="stValue" style="color:#22c55e;font-size:14px">—</div></div>
+        <div class="stat-box"><div class="stat-label">My Plan</div><div class="stat-val" id="stPlan" style="font-size:13px">—</div></div>
       </div>
       <div class="card" style="padding:0;overflow:hidden;">
         <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-weight:800;color:#1a3370;font-size:14px;">📋 All Quotes</div>
+          <div style="font-weight:800;color:#1a3370;font-size:14px;">📋 My Quotes</div>
           <button onclick="showPage('quote')" style="font-size:12px;color:#ff6b00;font-weight:700;background:none;border:none;cursor:pointer;">+ New</button>
         </div>
-        <div id="quoteList"><div style="text-align:center;padding:30px;color:#aaa;">Loading...</div></div>
+        <div id="quoteList"><div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">Loading...</div></div>
       </div>
     </div>
   </div>
 
   <!-- QUOTE FORM -->
   <div class="page" id="page-quote">
-    <div style="max-width:600px;margin:0 auto;">
+    <div style="max-width:620px;margin:0 auto;">
       <div class="card">
         <div class="sec-title">👤 Customer Info</div>
         <div class="grid2">
-          <div class="finp" id="f-cn"><label>Name *</label><input id="cName" placeholder="Ramesh Kumar"/><div class="err">Required</div></div>
-          <div class="finp" id="f-cp"><label>Phone *</label><input id="cPhone" placeholder="+91-98765-43210"/><div class="err">Required</div></div>
-          <div class="finp full" id="f-ca"><label>Address *</label><textarea id="cAddr" rows="2" placeholder="Plot 12, Sector 15..."></textarea><div class="err">Required</div></div>
+          <div class="finp" id="f-cn"><label>Name *</label><input id="cName" placeholder="Ramesh Kumar"/><div class="err-msg">Required</div></div>
+          <div class="finp" id="f-cp"><label>Phone *</label><input id="cPhone" placeholder="+91-98765-43210"/><div class="err-msg">Required</div></div>
+          <div class="finp full" id="f-ca"><label>Address *</label><textarea id="cAddr" rows="2" placeholder="Plot 12, Sector 15, Mumbai..."></textarea><div class="err-msg">Required</div></div>
           <div class="finp" id="f-cs"><label>State *</label>
-            <select id="cState" onchange="liveCalc()"><option value="">Select...</option>
+            <select id="cState" onchange="liveCalc()"><option value="">Select State...</option>
               <option>Maharashtra</option><option>Gujarat</option><option>Rajasthan</option><option>Tamil Nadu</option><option>Karnataka</option><option>Delhi</option><option>Uttar Pradesh</option><option>Telangana</option><option>Haryana</option><option>Punjab</option><option>Madhya Pradesh</option><option>Andhra Pradesh</option><option>West Bengal</option><option>Bihar</option><option>Odisha</option><option>Other</option>
-            </select><div class="err">Required</div>
+            </select><div class="err-msg">Required</div>
           </div>
-          <div class="finp"><label>DISCOM</label><input id="cDiscom" placeholder="MSEDCL, BSES..."/></div>
+          <div class="finp"><label>DISCOM</label><input id="cDiscom" placeholder="MSEDCL, BSES, BESCOM..."/></div>
         </div>
       </div>
       <div class="card">
         <div class="sec-title">⚡ System Details</div>
         <div class="grid2">
-          <div class="finp" id="f-bill"><label>Monthly Bill (₹) *</label><input type="number" id="fBill" placeholder="5000" oninput="liveCalc()"/><div class="err">Enter amount</div></div>
+          <div class="finp" id="f-bill"><label>Monthly Bill (₹) *</label><input type="number" id="fBill" placeholder="5000" oninput="liveCalc()"/><div class="err-msg">Enter valid amount</div></div>
           <div class="finp"><label>Tariff ₹/kWh</label><input type="number" id="fTariff" value="7" step="0.5" oninput="liveCalc()"/></div>
           <div class="finp"><label>Roof Area (sqft)</label><input type="number" id="fRoof" placeholder="Optional" oninput="liveCalc()"/></div>
           <div class="finp"><label>Phase</label><select id="fPhase"><option value="single">Single Phase</option><option value="three">Three Phase</option></select></div>
@@ -208,74 +196,69 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
               <button onclick="setCat('industrial',this)">🏭 Industrial</button>
             </div>
           </div>
-          <div class="finp"><label>Panel</label><select id="fPanel"><option>Tier-1 Mono PERC/TOPCon</option><option>Waaree</option><option>Adani Solar</option><option>Tata Power Solar</option><option>Vikram Solar</option><option>Longi</option><option>Jinko</option></select></div>
-          <div class="finp"><label>Inverter</label><select id="fInverter"><option>Best Available</option><option>Sungrow</option><option>SolarEdge</option><option>Fronius</option><option>Growatt</option><option>Delta</option><option>Huawei</option></select></div>
+          <div class="finp"><label>Panel Brand</label><select id="fPanel"><option>Tier-1 Mono PERC/TOPCon</option><option>Waaree</option><option>Adani Solar</option><option>Tata Power Solar</option><option>Vikram Solar</option><option>Longi</option><option>Jinko</option></select></div>
+          <div class="finp"><label>Inverter Brand</label><select id="fInverter"><option>Best Available</option><option>Sungrow</option><option>SolarEdge</option><option>Fronius</option><option>Growatt</option><option>Delta</option><option>Huawei</option></select></div>
           <div class="finp"><label>Custom Rate ₹/kWp</label><input type="number" id="fRate" placeholder="Blank=standard" oninput="liveCalc()"/></div>
           <div class="finp"><label>Discount (₹)</label><input type="number" id="fDisc" value="0" oninput="liveCalc()"/></div>
         </div>
       </div>
       <div class="card">
         <div class="sec-title">📊 Live Estimate</div>
-        <div id="livePanel"><div style="text-align:center;padding:20px;color:#ccc;"><div style="font-size:32px;">☀</div><div style="font-size:12px;margin-top:6px;">Enter monthly bill</div></div></div>
+        <div id="livePanel"><div style="text-align:center;padding:20px;color:#ccc;"><div style="font-size:32px;">☀</div><div style="font-size:12px;margin-top:6px;">Enter monthly bill to see estimate</div></div></div>
       </div>
       <div class="gen-btns">
         <button class="btn-gen" id="genBtn" onclick="generateQuote()">☀ Generate & Download PDF</button>
         <button class="btn-wa" onclick="sendWA()">📱</button>
       </div>
-      <div style="text-align:center;font-size:11px;color:#bbb;margin-top:6px;">PDF downloads + saved to cloud ☁️</div>
+      <div style="text-align:center;font-size:11px;color:#bbb;margin-top:8px;">☁️ Quote auto-saved to cloud after PDF</div>
     </div>
   </div>
 
-  <!-- REMINDERS / FOLLOWUPS -->
+  <!-- REMINDERS -->
   <div class="page" id="page-reminders">
-    <div style="max-width:600px;margin:0 auto;">
+    <div style="max-width:620px;margin:0 auto;">
       <div class="card">
         <div class="sec-title">🔔 Follow-up Reminders</div>
         <div id="reminderList"><div style="text-align:center;padding:20px;color:#aaa;">Loading...</div></div>
       </div>
       <div class="card" style="background:#fff8f0;border:1.5px solid #ffe4c4;">
-        <div style="font-size:12px;color:#888;line-height:1.8;">
-          <b style="color:#ff6b00;">💡 Follow-up Tips:</b><br/>
-          • Day 1: Quote bheja — confirm karo<br/>
-          • Day 3: Follow-up call karo<br/>
-          • Day 7: Site visit fix karo<br/>
-          • Day 14: Final decision lo
+        <div style="font-size:12px;color:#666;line-height:2;">
+          <b style="color:#ff6b00;">💡 Follow-up Strategy:</b><br/>
+          📞 Day 1-2: Confirm quote received<br/>
+          📞 Day 3-5: Discuss queries<br/>
+          🏠 Day 7: Propose site visit<br/>
+          ✅ Day 14: Close the deal!
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TEMPLATE CUSTOMIZE -->
+  <!-- TEMPLATE -->
   <div class="page" id="page-template">
-    <div style="max-width:600px;margin:0 auto;">
+    <div style="max-width:620px;margin:0 auto;">
       <div class="card">
         <div class="sec-title">🎨 PDF Template Customize</div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div class="finp"><label>Quote Header Title</label><input id="tTitle" placeholder="Professional Solar Quotation | India 2025"/></div>
-          <div class="finp"><label>Footer / Tagline</label><input id="tFooter" placeholder="India ka #1 Solar Installer"/></div>
-          <div class="finp"><label>WhatsApp Message Template</label><textarea id="tWA" rows="5" placeholder="Customized WhatsApp message..."></textarea></div>
-          <div class="finp"><label>Terms & Conditions (PDF)</label><textarea id="tTerms" rows="3" placeholder="Custom terms..."></textarea></div>
-          <div class="finp"><label>Header Color</label>
+          <div class="finp"><label>Company Tagline (PDF footer)</label><input id="tFooter" placeholder="India ka Trusted Solar Partner"/></div>
+          <div class="finp"><label>Custom Payment Terms</label><textarea id="tPayment" rows="2" placeholder="30% Advance | 60% Before Install | 10% After..."></textarea></div>
+          <div class="finp"><label>Extra Terms & Conditions</label><textarea id="tTerms" rows="2" placeholder="Additional warranty or service terms..."></textarea></div>
+          <div>
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:8px;">PDF Header Color</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <div onclick="setColor('#1a3370')" style="width:36px;height:36px;background:#1a3370;border-radius:8px;cursor:pointer;border:3px solid transparent;" id="clr-navy" class="clr-opt active-clr"></div>
-              <div onclick="setColor('#0d6b2e')" style="width:36px;height:36px;background:#0d6b2e;border-radius:8px;cursor:pointer;border:3px solid transparent;" id="clr-green" class="clr-opt"></div>
-              <div onclick="setColor('#7c1a1a')" style="width:36px;height:36px;background:#7c1a1a;border-radius:8px;cursor:pointer;border:3px solid transparent;" id="clr-red" class="clr-opt"></div>
-              <div onclick="setColor('#1a1a7c')" style="width:36px;height:36px;background:#1a1a7c;border-radius:8px;cursor:pointer;border:3px solid transparent;" id="clr-blue" class="clr-opt"></div>
-              <div onclick="setColor('#4a1a7c')" style="width:36px;height:36px;background:#4a1a7c;border-radius:8px;cursor:pointer;border:3px solid transparent;" id="clr-purple" class="clr-opt"></div>
-              <div onclick="setColor('#7c4a1a')" style="width:36px;height:36px;background:#7c4a1a;border-radius:8px;cursor:pointer;border:3px solid transparent;" id="clr-brown" class="clr-opt"></div>
+              <div class="clr-swatch selected" style="background:#1a3370;" onclick="setClr('#1a3370',this)"></div>
+              <div class="clr-swatch" style="background:#0d6b2e;" onclick="setClr('#0d6b2e',this)"></div>
+              <div class="clr-swatch" style="background:#7c1a1a;" onclick="setClr('#7c1a1a',this)"></div>
+              <div class="clr-swatch" style="background:#1a1a7c;" onclick="setClr('#1a1a7c',this)"></div>
+              <div class="clr-swatch" style="background:#4a1a7c;" onclick="setClr('#4a1a7c',this)"></div>
+              <div class="clr-swatch" style="background:#1a5a5a;" onclick="setClr('#1a5a5a',this)"></div>
             </div>
           </div>
-          <div class="finp"><label>Payment Terms Custom</label><textarea id="tPayment" rows="2" placeholder="30% Advance | 60% Before Install | 10% After..."></textarea></div>
+          <div class="finp"><label>WhatsApp Message Template</label>
+            <textarea id="tWA" rows="4" placeholder="Hi {name}, Aapka solar quote ready hai! System: {kwp} kWp, Cost: {net}..."></textarea>
+            <div style="font-size:10px;color:#aaa;margin-top:4px;">Variables: {name} {kwp} {net} {sav} {pb} {company}</div>
+          </div>
           <button class="btn-primary" onclick="saveTemplate()">💾 Save Template</button>
-        </div>
-      </div>
-      <div class="card" style="background:#f0f4ff;">
-        <div style="font-size:12px;color:#666;line-height:1.8;">
-          <b style="color:#1a3370;">💡 Template Tips:</b><br/>
-          • Header title PDF ke top pe dikhega<br/>
-          • WA template quote ke saath bhejega<br/>
-          • Color change se PDF alag dikhega<br/>
-          • Terms PDF ke bottom mein jayenge
         </div>
       </div>
     </div>
@@ -285,22 +268,23 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
   <div class="page" id="page-settings">
     <div style="max-width:500px;margin:0 auto;">
       <div class="card">
-        <div class="sec-title">⚙ Company Branding</div>
+        <div class="sec-title">🏢 Company Profile</div>
         <div style="display:flex;flex-direction:column;gap:14px;">
-          <div class="finp"><label>Company Name</label><input id="sCompany" placeholder="ABC Solar Pvt Ltd"/></div>
-          <div class="finp"><label>Phone</label><input id="sPhone" placeholder="+91-99999-00000"/></div>
+          <div class="finp"><label>Company / Installer Name</label><input id="sCompany" placeholder="ABC Solar Pvt Ltd"/></div>
+          <div class="finp"><label>Phone Number</label><input id="sPhone" placeholder="+91-99999-00000"/></div>
           <div class="finp"><label>GST Number</label><input id="sGst" placeholder="27XXXXX1234X1ZX"/></div>
           <div class="finp"><label>Website</label><input id="sWeb" placeholder="www.abcsolar.in"/></div>
-          <button class="btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+          <button class="btn-primary" onclick="saveSettings()">💾 Save Company Profile</button>
         </div>
       </div>
       <div class="card">
-        <div class="sec-title">👤 Account</div>
-        <div style="font-size:13px;color:#666;line-height:2.2;">
-          <div>Email: <b id="settEmail">-</b></div>
+        <div class="sec-title">👤 My Account</div>
+        <div style="font-size:13px;color:#555;line-height:2.2;">
+          <div>Email: <b id="settEmail">—</b></div>
           <div>Plan: <span id="settPlan" class="plan-badge plan-free">Free</span></div>
+          <div style="font-size:11px;color:#aaa;margin-top:4px;">Data securely synced to cloud ☁️</div>
         </div>
-        <button onclick="doLogout()" style="margin-top:14px;width:100%;padding:11px;border-radius:9px;border:1.5px solid #ddd;background:white;color:#666;font-weight:700;cursor:pointer;font-size:13px;">Logout</button>
+        <button onclick="doLogout()" style="margin-top:14px;width:100%;padding:11px;border-radius:9px;border:1.5px solid #ddd;background:white;color:#666;font-weight:700;cursor:pointer;font-size:13px;">🚪 Logout</button>
       </div>
     </div>
   </div>
@@ -309,12 +293,12 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 <!-- REMINDER MODAL -->
 <div class="modal-overlay" id="reminderModal">
   <div class="modal">
-    <h3>🔔 Set Follow-up Reminder</h3>
-    <div class="field"><label>Customer Name</label><input id="rName" readonly style="background:#f0f0f0;"/></div>
+    <h3 style="font-size:16px;font-weight:800;color:#1a3370;margin-bottom:16px;">🔔 Set Follow-up Reminder</h3>
+    <div class="field"><label>Customer</label><input id="rName" readonly style="background:#f5f5f5;"/></div>
     <div class="field"><label>Reminder Date</label><input type="date" id="rDate"/></div>
-    <div class="field"><label>Note</label><textarea id="rNote" rows="2" placeholder="Call regarding quotation..."></textarea></div>
-    <div style="display:flex;gap:10px;margin-top:4px;">
-      <button onclick="saveReminder()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#ff6b00;color:white;font-weight:800;cursor:pointer;">Save Reminder</button>
+    <div class="field"><label>Note</label><textarea id="rNote" rows="2" placeholder="Call regarding quotation approval..."></textarea></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveReminder()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#ff6b00;color:white;font-weight:800;cursor:pointer;">Save</button>
       <button onclick="closeModal('reminderModal')" style="padding:12px 18px;border-radius:10px;border:1.5px solid #ddd;background:white;font-weight:700;cursor:pointer;">Cancel</button>
     </div>
   </div>
@@ -323,18 +307,18 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 <!-- STATUS MODAL -->
 <div class="modal-overlay" id="statusModal">
   <div class="modal">
-    <h3>📊 Update Quote Status</h3>
-    <input type="hidden" id="statusQuoteId"/>
+    <h3 style="font-size:16px;font-weight:800;color:#1a3370;margin-bottom:16px;">📊 Update Quote Status</h3>
+    <input type="hidden" id="statusQId"/>
     <div class="field"><label>Status</label>
-      <select id="statusSelect">
+      <select id="statusSel" style="width:100%;padding:11px;border-radius:9px;border:1.5px solid #ddd;font-size:14px;outline:none;">
         <option value="sent">📤 Sent</option>
         <option value="followup">🔔 Follow-up Pending</option>
-        <option value="closed">✅ Closed (Won)</option>
+        <option value="closed">✅ Closed — Won!</option>
         <option value="lost">❌ Lost</option>
       </select>
     </div>
-    <div style="display:flex;gap:10px;margin-top:4px;">
-      <button onclick="saveStatus()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#1a3370;color:white;font-weight:800;cursor:pointer;">Update Status</button>
+    <div style="display:flex;gap:10px;">
+      <button onclick="saveStatus()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#1a3370;color:white;font-weight:800;cursor:pointer;">Update</button>
       <button onclick="closeModal('statusModal')" style="padding:12px 18px;border-radius:10px;border:1.5px solid #ddd;background:white;font-weight:700;cursor:pointer;">Cancel</button>
     </div>
   </div>
@@ -343,10 +327,12 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 <div class="toast" id="toast"></div>
 
 <script>
-const SB=supabase.createClient('https://sveixtxuascbvoeyxqgl.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZWl4dHh1YXNjYnZvZXl4cWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxOTI3MDQsImV4cCI6MjA4Nzc2ODcwNH0.t6Bs8weRt4EMjiX0aICArsGaVS6buiakrPST4RVsfHY');
+const SUPA_URL='https://sveixtxuascbvoeyxqgl.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZWl4dHh1YXNjYnZvZXl4cWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxOTI3MDQsImV4cCI6MjA4Nzc2ODcwNH0.t6Bs8weRt4EMjiX0aICArsGaVS6buiakrPST4RVsfHY';
+const SB=supabase.createClient(SUPA_URL,SUPA_KEY);
 const SC={panelWatt:545,res:45000,com:40000,ind:35000,s2:30000,s3:60000,s3p:78000,upd:4.5,deg:0.005,exp:3.5,maint:0.01,co2:0.82};
 const NM={Maharashtra:"Net Metering up to 1 MW | MSEDCL | Annual",Gujarat:"Net Metering up to 1 MW | DGVCL | Monthly",Rajasthan:"Net Metering up to 1 MW | JDVVNL | Quarterly","Tamil Nadu":"Net Metering up to 1 MW | TANGEDCO | Annual",Karnataka:"Net Metering up to 1 MW | BESCOM | Annual",Delhi:"Net Metering up to 500 kW | BSES | Monthly","Uttar Pradesh":"Net Metering up to 1 MW | UPPCL | Quarterly",Telangana:"Net Metering up to 1 MW | TSSPDCL | Annual",Haryana:"Net Metering up to 500 kW | DHBVN | Monthly",Punjab:"Net Metering up to 1 MW | PSPCL | Annual",Other:"Net Metering as per MNRE/CERC guidelines."};
-let cat='residential',currentUser=null,currentProfile=null,currentTemplate={color:'#1a3370',title:'',footer:'',wa:'',terms:'',payment:''},pendingReminderId=null,pendingReminderName=null;
+let cat='residential',CU=null,CP=null,CT={color:'#1a3370',title:'',footer:'',payment:'',terms:'',wa:''},pendingRId=null,pendingRName=null,pdfBlob=null;
 
 function inr(n){const a=Math.abs(Math.round(n));const s=a.toString();if(s.length<=3)return(n<0?'-':'')+'₹'+s;let r=s.slice(-3),m=s.slice(0,-3);while(m.length>2){r=m.slice(-2)+','+r;m=m.slice(0,-2);}return(n<0?'-':'')+'₹'+m+','+r;}
 function showToast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#22c55e':'#ef4444';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
@@ -358,7 +344,7 @@ function switchAuth(m){
   authMode=m;
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(m==='login'&&i===0)||(m==='signup'&&i===1)));
   document.getElementById('signupExtra').style.display=m==='signup'?'block':'none';
-  document.getElementById('authBtn').textContent=m==='login'?'Login':'Create Free Account';
+  document.getElementById('authBtn').textContent=m==='login'?'Login':'🚀 Create Free Account';
   document.getElementById('authSub').textContent=m==='login'?'Sign in to continue':'Create your free account';
   document.getElementById('authMsg').className='msg';
 }
@@ -366,44 +352,46 @@ async function doAuth(){
   const email=document.getElementById('aEmail').value.trim();
   const pass=document.getElementById('aPass').value;
   const msg=document.getElementById('authMsg');
-  if(!email||!pass){msg.className='msg err';msg.textContent='Fill all fields';return;}
+  if(!email||!pass){msg.className='msg err';msg.textContent='Please fill all fields';return;}
   document.getElementById('authBtn').disabled=true;document.getElementById('authBtn').textContent='Please wait...';
   if(authMode==='signup'){
     const {data,error}=await SB.auth.signUp({email,password:pass});
-    if(error){msg.className='msg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='Create Free Account';return;}
-    if(data.user){await SB.from('profiles').upsert({id:data.user.id,company_name:document.getElementById('aCompany').value||'My Solar Company',phone:document.getElementById('aPhone').value||''});}
-    msg.className='msg ok';msg.textContent='✅ Account created!';
-    setTimeout(()=>loadApp(data.user),1000);
+    if(error){msg.className='msg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='🚀 Create Free Account';return;}
+    if(data.user){
+      await SB.from('profiles').upsert({id:data.user.id,company_name:document.getElementById('aCompany').value.trim()||'My Solar Company',phone:document.getElementById('aPhone').value.trim()||'',plan:'free',quotes_count:0});
+    }
+    msg.className='msg ok';msg.textContent='✅ Account created! Logging in...';
+    setTimeout(()=>initApp(data.user),1200);
   } else {
     const {data,error}=await SB.auth.signInWithPassword({email,password:pass});
     if(error){msg.className='msg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='Login';return;}
-    loadApp(data.user);
+    initApp(data.user);
   }
 }
-async function loadApp(user){
-  currentUser=user;
+async function initApp(user){
+  CU=user;
   const {data:prof}=await SB.from('profiles').select('*').eq('id',user.id).single();
-  currentProfile=prof;
+  CP=prof||{plan:'free'};
   document.getElementById('authScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
-  document.getElementById('navName').textContent=prof?.company_name||user.email;
+  document.getElementById('navName').textContent=CP.company_name||user.email;
   document.getElementById('settEmail').textContent=user.email;
-  document.getElementById('sCompany').value=prof?.company_name||'';
-  document.getElementById('sPhone').value=prof?.phone||'';
-  document.getElementById('sGst').value=prof?.gst||'';
-  document.getElementById('sWeb').value=prof?.website||'';
-  const plan=prof?.plan||'free';
+  document.getElementById('sCompany').value=CP.company_name||'';
+  document.getElementById('sPhone').value=CP.phone||'';
+  document.getElementById('sGst').value=CP.gst||'';
+  document.getElementById('sWeb').value=CP.website||'';
+  const plan=CP.plan||'free';
   document.getElementById('settPlan').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
   document.getElementById('settPlan').className='plan-badge plan-'+plan;
   loadTemplate();
-  loadAdminMessages();
+  loadAdminMsgs();
   loadDashboard();
   checkReminders();
 }
-async function doLogout(){await SB.auth.signOut();document.getElementById('mainApp').style.display='none';document.getElementById('authScreen').style.display='flex';}
-window.onload=async function(){const {data}=await SB.auth.getSession();if(data.session)loadApp(data.session.user);};
+async function doLogout(){await SB.auth.signOut();document.getElementById('mainApp').style.display='none';document.getElementById('authScreen').style.display='flex';CU=null;CP=null;}
+window.onload=async()=>{const {data}=await SB.auth.getSession();if(data.session)initApp(data.session.user);};
 
-// NAVIGATION
+// NAV
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -415,14 +403,14 @@ function showPage(name){
   window.scrollTo(0,0);
 }
 
-// SOLAR CALC
+// CALC
 function setCat(c,btn){cat=c;document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');liveCalc();}
 function calcD(){
-  const bill=parseFloat(document.getElementById('fBill').value)||0;
-  const tariff=parseFloat(document.getElementById('fTariff').value)||7;
-  const roof=parseFloat(document.getElementById('fRoof').value)||null;
-  const cr=parseFloat(document.getElementById('fRate').value)||null;
-  const disc=parseFloat(document.getElementById('fDisc').value)||0;
+  const bill=+document.getElementById('fBill').value||0;
+  const tariff=+document.getElementById('fTariff').value||7;
+  const roof=+document.getElementById('fRoof').value||null;
+  const cr=+document.getElementById('fRate').value||null;
+  const disc=+document.getElementById('fDisc').value||0;
   if(!bill||bill<100)return null;
   let kWp=Math.round((bill/tariff/30/SC.upd)*2)/2;kWp=Math.max(1,kWp);
   if(roof){const mx=Math.round(((roof*0.0929)/10)*2)/2;if(kWp>mx)kWp=Math.max(1,mx);}
@@ -439,58 +427,55 @@ function calcD(){
 function liveCalc(){
   const d=calcD();const p=document.getElementById('livePanel');
   if(!d){p.innerHTML='<div style="text-align:center;padding:16px;color:#ccc;"><div style="font-size:32px;">☀</div><div style="font-size:12px;margin-top:6px;">Enter monthly bill</div></div>';return;}
-  let sub=d.sub>0?`<div class="subsidy-box"><span style="font-size:20px">🏛</span><div><div style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:1px">MNRE SUBSIDY!</div><div style="font-size:17px;font-weight:800;color:#16a34a">${inr(d.sub)}</div></div></div>`:'';
-  p.innerHTML=`<div class="metric-grid"><div class="metric"><div class="ml">System</div><div class="mv" style="color:#f60">${d.kWp} kWp</div><div class="ms">${d.panels} panels</div></div><div class="metric"><div class="ml">Annual Gen</div><div class="mv" style="color:#f59e0b">${d.gen.toLocaleString()}</div><div class="ms">kWh/yr</div></div><div class="metric"><div class="ml">Net Cost</div><div class="mv" style="color:#f60">${inr(d.net)}</div><div class="ms">${inr(d.gross)} gross</div></div><div class="metric"><div class="ml">Savings/yr</div><div class="mv" style="color:#22c55e">${inr(d.netSav)}</div><div class="ms">${d.pb}yr payback</div></div></div>${sub}<div class="roi-bar"><div style="display:flex;justify-content:space-between;font-size:10px;color:#bbb"><span>25-Year ROI</span><span style="font-weight:800;color:#f59e0b">${d.roi}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,d.roi/5)}%"></div></div></div><div style="text-align:center;font-size:10px;color:#bbb">🌱 ${d.co2}t CO₂/yr = ${Math.round(d.co2*45)} trees</div>`;
+  const sub=d.sub>0?`<div class="subsidy-box"><span style="font-size:20px">🏛</span><div><div style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:1px">MNRE SUBSIDY!</div><div style="font-size:17px;font-weight:800;color:#16a34a">${inr(d.sub)}</div></div></div>`:'';
+  p.innerHTML=`<div class="metric-grid"><div class="metric"><div class="ml">System</div><div class="mv" style="color:#f60">${d.kWp} kWp</div><div class="ms">${d.panels} panels</div></div><div class="metric"><div class="ml">Annual Gen</div><div class="mv" style="color:#f59e0b">${d.gen.toLocaleString()}</div><div class="ms">kWh/yr</div></div><div class="metric"><div class="ml">Net Cost</div><div class="mv" style="color:#f60">${inr(d.net)}</div><div class="ms">Gross ${inr(d.gross)}</div></div><div class="metric"><div class="ml">Savings/yr</div><div class="mv" style="color:#22c55e">${inr(d.netSav)}</div><div class="ms">${d.pb}yr payback</div></div></div>${sub}<div class="roi-bar"><div style="display:flex;justify-content:space-between;font-size:10px;color:#bbb"><span>25-Year ROI</span><span style="font-weight:800;color:#f59e0b">${d.roi}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,d.roi/5)}%"></div></div></div><div style="text-align:center;font-size:10px;color:#bbb;margin-top:4px;">🌱 ${d.co2}t CO₂/yr = ${Math.round(d.co2*45)} trees</div>`;
 }
 
 // DASHBOARD
 async function loadDashboard(){
-  if(!currentUser)return;
-  const {data:quotes}=await SB.from('quotes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  const qs=quotes||[];
+  if(!CU)return;
+  const {data:qs}=await SB.from('quotes').select('*').eq('user_id',CU.id).order('created_at',{ascending:false});
+  const quotes=qs||[];
   const now=new Date();
-  document.getElementById('stTotal').textContent=qs.length;
-  document.getElementById('stMonth').textContent=qs.filter(q=>new Date(q.created_at).getMonth()===now.getMonth()).length;
-  document.getElementById('stValue').textContent=inr(qs.reduce((a,q)=>a+(q.net_cost||0),0));
-  const plan=currentProfile?.plan||'free';
+  document.getElementById('stTotal').textContent=quotes.length;
+  document.getElementById('stMonth').textContent=quotes.filter(q=>new Date(q.created_at).getMonth()===now.getMonth()&&new Date(q.created_at).getFullYear()===now.getFullYear()).length;
+  document.getElementById('stValue').textContent=inr(quotes.reduce((a,q)=>a+(q.net_cost||0),0));
+  const plan=CP?.plan||'free';
   document.getElementById('stPlan').innerHTML=`<span class="plan-badge plan-${plan}">${plan.charAt(0).toUpperCase()+plan.slice(1)}</span>`;
-  if(qs.length===0){document.getElementById('quoteList').innerHTML='<div style="text-align:center;padding:40px;color:#ccc;"><div style="font-size:40px;">☀</div><div style="font-weight:700;font-size:14px;margin:8px 0 4px;">No quotes yet</div><button onclick="showPage(\'quote\')" style="margin-top:10px;padding:10px 24px;border-radius:9px;background:#ff6b00;color:white;border:none;font-weight:700;cursor:pointer;">+ New Quote</button></div>';return;}
-  const statusLabels={sent:'📤 Sent',followup:'🔔 Follow-up',closed:'✅ Closed',lost:'❌ Lost'};
-  document.getElementById('quoteList').innerHTML=qs.map(q=>`
+  if(!quotes.length){document.getElementById('quoteList').innerHTML='<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;">☀</div><div style="font-weight:700;font-size:15px;color:#bbb;margin:10px 0 4px;">No quotes yet</div><div style="font-size:12px;margin-bottom:16px;">Create your first solar quotation</div><button onclick="showPage(\'quote\')" style="padding:10px 24px;border-radius:9px;background:#ff6b00;color:white;border:none;font-weight:700;cursor:pointer;font-size:13px;">+ Create Quote</button></div>';return;}
+  const sl={sent:'📤 Sent',followup:'🔔 Follow-up',closed:'✅ Closed',lost:'❌ Lost'};
+  document.getElementById('quoteList').innerHTML=quotes.map(q=>`
     <div class="quote-item">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-weight:700;font-size:14px;">${q.customer_name}</div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span class="status-badge s-${q.status||'sent'}">${statusLabels[q.status||'sent']}</span>
-          <span style="font-size:13px;font-weight:800;color:#ff6b00;">${q.system_kwp} kWp</span>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="font-weight:700;font-size:14px;flex:1;">${q.customer_name}</div>
+        <span class="status-badge s-${q.status||'sent'}">${sl[q.status||'sent']}</span>
+        <span style="font-size:14px;font-weight:800;color:#ff6b00;">${q.system_kwp} kWp</span>
       </div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px;">${q.quote_number} • ${q.customer_state} • ${new Date(q.created_at).toLocaleDateString('en-IN')}</div>
+      <div style="font-size:11px;color:#aaa;margin-top:3px;">${q.quote_number||'—'} • ${q.customer_state} • ${new Date(q.created_at).toLocaleDateString('en-IN')}</div>
       <div style="display:flex;gap:14px;margin-top:6px;">
-        <div><div style="font-size:13px;font-weight:700;">${inr(q.net_cost)}</div><div style="font-size:10px;color:#aaa;">Cost</div></div>
+        <div><div style="font-size:13px;font-weight:700;">${inr(q.net_cost)}</div><div style="font-size:10px;color:#aaa;">Net Cost</div></div>
         <div><div style="font-size:13px;font-weight:700;color:#22c55e;">${inr(q.annual_savings)}/yr</div><div style="font-size:10px;color:#aaa;">Savings</div></div>
         <div><div style="font-size:12px;font-weight:700;color:#f59e0b;">${q.payback_years} yrs</div><div style="font-size:10px;color:#aaa;">Payback</div></div>
       </div>
       <div class="qi-btns">
-        <button class="qi-btn wa" onclick="waDash('${q.customer_name}',${q.system_kwp},${q.net_cost},${q.annual_savings},${q.payback_years})">📱 WA</button>
-        <button class="qi-btn reminder" onclick="openReminder('${q.id}','${q.customer_name}')">🔔 Remind</button>
+        <button class="qi-btn wa" onclick="waDash('${q.customer_name}',${q.system_kwp},${q.net_cost},${q.annual_savings},${q.payback_years},${q.subsidy||0})">📱 WA</button>
+        <button class="qi-btn reminder" onclick="openReminder('${q.id}','${q.customer_name.replace(/'/g,'&#39;')}')">🔔 Remind</button>
         <button class="qi-btn status" onclick="openStatus('${q.id}','${q.status||'sent'}')">📊 Status</button>
         <button class="qi-btn del" onclick="delQuote('${q.id}')">🗑</button>
       </div>
     </div>`).join('');
 }
-
-async function delQuote(id){if(!confirm('Delete?'))return;await SB.from('quotes').delete().eq('id',id);showToast('Deleted!');loadDashboard();}
-
-function waDash(name,kwp,net,sav,pb){
-  const company=currentProfile?.company_name||'SolarQuote Pro';
-  const tmpl=currentTemplate.wa||`Hi ${name},%0A%0AYour Solar Quote:%0A☀ *${kwp} kWp* System%0A💰 Investment: *${inr(net)}*%0A📊 Savings: *${inr(sav)}/yr*%0A⏱ Payback: *${pb} Yrs*%0A%0AFrom: ${company}`;
-  window.open('https://wa.me/?text='+tmpl.replace('{name}',name).replace('{kwp}',kwp).replace('{net}',inr(net)).replace('{sav}',inr(sav)).replace('{pb}',pb).replace('{company}',company),'_blank');
+async function delQuote(id){if(!confirm('Delete this quote?'))return;await SB.from('quotes').delete().eq('id',id);showToast('Deleted!');loadDashboard();}
+function waDash(name,kwp,net,sav,pb,sub){
+  const co=CP?.company_name||'SolarQuote Pro';
+  let msg=CT.wa||`Hi ${name},%0A%0AYour Solar Quotation is ready!%0A%0A☀ System: *${kwp} kWp*%0A💰 Investment: *${inr(net)}*%0A🏛 MNRE Subsidy: *${inr(sub)}*%0A📊 Annual Savings: *${inr(sav)}*%0A⏱ Payback: *${pb} Years*%0A%0AFrom: ${co}`;
+  msg=msg.replace(/{name}/g,name).replace(/{kwp}/g,kwp).replace(/{net}/g,inr(net)).replace(/{sav}/g,inr(sav)).replace(/{pb}/g,pb).replace(/{company}/g,co);
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 
 // REMINDERS
 function openReminder(id,name){
-  pendingReminderId=id;pendingReminderName=name;
+  pendingRId=id;pendingRName=name;
   document.getElementById('rName').value=name;
   const d=new Date();d.setDate(d.getDate()+3);
   document.getElementById('rDate').value=d.toISOString().split('T')[0];
@@ -498,211 +483,179 @@ function openReminder(id,name){
   document.getElementById('reminderModal').classList.add('show');
 }
 function saveReminder(){
-  const reminders=JSON.parse(localStorage.getItem('sq_reminders')||'[]');
-  reminders.push({id:Date.now().toString(),quoteId:pendingReminderId,name:pendingReminderName,date:document.getElementById('rDate').value,note:document.getElementById('rNote').value,done:false,userId:currentUser?.id});
-  localStorage.setItem('sq_reminders',JSON.stringify(reminders));
-  closeModal('reminderModal');
-  showToast('✅ Reminder set!');
-  checkReminders();
+  const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');
+  rs.push({id:Date.now().toString(),qId:pendingRId,name:pendingRName,date:document.getElementById('rDate').value,note:document.getElementById('rNote').value,done:false});
+  localStorage.setItem('sq_rem_'+CU?.id,JSON.stringify(rs));
+  closeModal('reminderModal');showToast('✅ Reminder set!');checkReminders();
 }
 function loadReminders(){
-  const reminders=JSON.parse(localStorage.getItem('sq_reminders')||'[]').filter(r=>r.userId===currentUser?.id);
+  const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');
   const today=new Date().toISOString().split('T')[0];
-  if(reminders.length===0){document.getElementById('reminderList').innerHTML='<div style="text-align:center;padding:30px;color:#ccc;"><div style="font-size:36px;">🔔</div><div style="font-size:13px;margin-top:8px;">No reminders set</div><div style="font-size:11px;margin-top:4px;color:#ddd;">Set reminders from Dashboard → Quote → 🔔 Remind</div></div>';return;}
-  document.getElementById('reminderList').innerHTML=reminders.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`
+  if(!rs.length){document.getElementById('reminderList').innerHTML='<div style="text-align:center;padding:30px;color:#ccc;"><div style="font-size:36px;">🔔</div><div style="font-size:13px;margin-top:8px;">No reminders set</div><div style="font-size:11px;color:#ddd;margin-top:4px;">Go to Dashboard → Quote → 🔔 Remind</div></div>';return;}
+  document.getElementById('reminderList').innerHTML=rs.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`
     <div class="reminder-item" style="${r.done?'opacity:0.5;':''}${r.date<=today&&!r.done?'background:#fff0f0;border-color:#fecaca;':''}">
-      <div>
+      <div style="flex:1;">
         <div style="font-weight:700;font-size:13px;">${r.name}</div>
-        <div style="font-size:12px;color:#888;margin-top:2px;">📅 ${new Date(r.date).toLocaleDateString('en-IN')}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px;">📅 ${new Date(r.date).toLocaleDateString('en-IN')}</div>
         <div style="font-size:11px;color:#aaa;margin-top:2px;">${r.note}</div>
-        ${r.date<=today&&!r.done?'<div style="font-size:11px;color:#ef4444;font-weight:700;margin-top:3px;">⚠ Due today!</div>':''}
+        ${r.date<=today&&!r.done?'<div style="font-size:11px;color:#ef4444;font-weight:700;margin-top:3px;">⚠️ Due today!</div>':''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        ${!r.done?`<button onclick="doneReminder('${r.id}')" style="padding:5px 10px;border-radius:7px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-size:11px;font-weight:700;cursor:pointer;">✅ Done</button>`:'<span style="font-size:11px;color:#16a34a;font-weight:700;">✅ Done</span>'}
-        <button onclick="delReminder('${r.id}')" style="padding:5px 10px;border-radius:7px;background:#fff0f0;color:#ef4444;border:1px solid #fecaca;font-size:11px;font-weight:700;cursor:pointer;">🗑</button>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${!r.done?`<button onclick="doneRem('${r.id}')" style="padding:5px 8px;border-radius:7px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-size:11px;font-weight:700;cursor:pointer;">✅</button>`:'<span style="font-size:11px;color:#16a34a;font-weight:700;">✅</span>'}
+        <button onclick="delRem('${r.id}')" style="padding:5px 8px;border-radius:7px;background:#fff0f0;color:#ef4444;border:1px solid #fecaca;font-size:11px;font-weight:700;cursor:pointer;">🗑</button>
       </div>
     </div>`).join('');
 }
-function doneReminder(id){
-  const reminders=JSON.parse(localStorage.getItem('sq_reminders')||'[]');
-  const updated=reminders.map(r=>r.id===id?{...r,done:true}:r);
-  localStorage.setItem('sq_reminders',JSON.stringify(updated));
-  loadReminders();checkReminders();showToast('✅ Marked as done!');
-}
-function delReminder(id){
-  const reminders=JSON.parse(localStorage.getItem('sq_reminders')||'[]').filter(r=>r.id!==id);
-  localStorage.setItem('sq_reminders',JSON.stringify(reminders));
-  loadReminders();checkReminders();
-}
-function checkReminders(){
-  const reminders=JSON.parse(localStorage.getItem('sq_reminders')||'[]').filter(r=>r.userId===currentUser?.id);
-  const today=new Date().toISOString().split('T')[0];
-  const due=reminders.filter(r=>!r.done&&r.date<=today).length;
-  document.getElementById('reminderDot').style.display=due>0?'inline-block':'none';
-}
+function doneRem(id){const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]').map(r=>r.id===id?{...r,done:true}:r);localStorage.setItem('sq_rem_'+CU?.id,JSON.stringify(rs));loadReminders();checkReminders();showToast('✅ Done!');}
+function delRem(id){const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]').filter(r=>r.id!==id);localStorage.setItem('sq_rem_'+CU?.id,JSON.stringify(rs));loadReminders();checkReminders();}
+function checkReminders(){const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');const t=new Date().toISOString().split('T')[0];const due=rs.filter(r=>!r.done&&r.date<=t).length;document.getElementById('reminderDot').style.display=due>0?'inline-block':'none';}
 
 // STATUS
-function openStatus(id,status){
-  document.getElementById('statusQuoteId').value=id;
-  document.getElementById('statusSelect').value=status;
-  document.getElementById('statusModal').classList.add('show');
-}
-async function saveStatus(){
-  const id=document.getElementById('statusQuoteId').value;
-  const status=document.getElementById('statusSelect').value;
-  await SB.from('quotes').update({status}).eq('id',id);
-  closeModal('statusModal');
-  showToast('✅ Status updated!');
-  loadDashboard();
-}
+function openStatus(id,status){document.getElementById('statusQId').value=id;document.getElementById('statusSel').value=status;document.getElementById('statusModal').classList.add('show');}
+async function saveStatus(){const id=document.getElementById('statusQId').value;const status=document.getElementById('statusSel').value;await SB.from('quotes').update({status}).eq('id',id);closeModal('statusModal');showToast('✅ Status updated!');loadDashboard();}
 
 // ADMIN MESSAGES
-async function loadAdminMessages(){
+async function loadAdminMsgs(){
   try{
-    const {data:msgs}=await SB.from('admin_messages').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(3);
-    if(!msgs||msgs.length===0){document.getElementById('adminMsgs').innerHTML='';return;}
-    document.getElementById('adminMsgs').innerHTML=`<div class="card" style="background:#f0f4ff;border:1.5px solid #c7d7ff;margin-bottom:14px;">
-      <div style="font-size:10px;font-weight:800;color:#1a3370;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📢 Message from Admin</div>
-      ${msgs.map(m=>`<div class="admin-msg"><div class="admin-msg-title">${m.subject||'Message'}</div><div class="admin-msg-body">${m.body}</div><div class="admin-msg-date">${new Date(m.created_at).toLocaleDateString('en-IN')}</div></div>`).join('')}
-    </div>`;
-  }catch(e){document.getElementById('adminMsgs').innerHTML='';}
+    const {data:msgs}=await SB.from('admin_messages').select('*').eq('user_id',CU.id).order('created_at',{ascending:false}).limit(3);
+    if(!msgs||!msgs.length){document.getElementById('adminMsgArea').innerHTML='';return;}
+    document.getElementById('adminMsgArea').innerHTML=`<div class="admin-msg-card"><div style="font-size:10px;font-weight:800;color:#1a3370;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">📢 Message from Admin</div>${msgs.map(m=>`<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:13px;">${m.subject||'Update'}</div><div style="font-size:12px;color:#555;margin-top:3px;">${m.body}</div><div style="font-size:10px;color:#aaa;margin-top:3px;">${new Date(m.created_at).toLocaleDateString('en-IN')}</div></div>`).join('')}</div>`;
+  }catch(e){document.getElementById('adminMsgArea').innerHTML='';}
 }
 
 // TEMPLATE
-function setColor(color){
-  currentTemplate.color=color;
-  document.querySelectorAll('.clr-opt').forEach(c=>c.style.border='3px solid transparent');
-  event.target.style.border='3px solid #ff6b00';
-  localStorage.setItem('sq_template_'+currentUser?.id,JSON.stringify(currentTemplate));
-}
-function loadTemplate(){
-  const saved=localStorage.getItem('sq_template_'+currentUser?.id);
-  if(saved){currentTemplate=JSON.parse(saved);}
-  document.getElementById('tTitle').value=currentTemplate.title||'';
-  document.getElementById('tFooter').value=currentTemplate.footer||'';
-  document.getElementById('tWA').value=currentTemplate.wa||'';
-  document.getElementById('tTerms').value=currentTemplate.terms||'';
-  document.getElementById('tPayment').value=currentTemplate.payment||'';
-}
-function saveTemplate(){
-  currentTemplate.title=document.getElementById('tTitle').value;
-  currentTemplate.footer=document.getElementById('tFooter').value;
-  currentTemplate.wa=document.getElementById('tWA').value;
-  currentTemplate.terms=document.getElementById('tTerms').value;
-  currentTemplate.payment=document.getElementById('tPayment').value;
-  localStorage.setItem('sq_template_'+currentUser?.id,JSON.stringify(currentTemplate));
-  showToast('✅ Template saved!');
+function setClr(c,el){CT.color=c;document.querySelectorAll('.clr-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');localStorage.setItem('sq_tpl_'+CU?.id,JSON.stringify(CT));}
+function loadTemplate(){const s=localStorage.getItem('sq_tpl_'+CU?.id);if(s)CT=JSON.parse(s);document.getElementById('tTitle').value=CT.title||'';document.getElementById('tFooter').value=CT.footer||'';document.getElementById('tPayment').value=CT.payment||'';document.getElementById('tTerms').value=CT.terms||'';document.getElementById('tWA').value=CT.wa||'';}
+function saveTemplate(){CT.title=document.getElementById('tTitle').value;CT.footer=document.getElementById('tFooter').value;CT.payment=document.getElementById('tPayment').value;CT.terms=document.getElementById('tTerms').value;CT.wa=document.getElementById('tWA').value;localStorage.setItem('sq_tpl_'+CU?.id,JSON.stringify(CT));showToast('✅ Template saved!');}
+
+// SETTINGS
+async function saveSettings(){
+  const p={id:CU.id,company_name:document.getElementById('sCompany').value.trim(),phone:document.getElementById('sPhone').value.trim(),gst:document.getElementById('sGst').value.trim(),website:document.getElementById('sWeb').value.trim()};
+  const {error}=await SB.from('profiles').upsert(p);
+  if(error){showToast('Error saving!',false);return;}
+  CP={...CP,...p};document.getElementById('navName').textContent=p.company_name||CU.email;showToast('✅ Saved!');
 }
 
-// GENERATE
+// GENERATE — PDF fix: single download only
 function validate(){
   let ok=true;
   [['cName','f-cn'],['cPhone','f-cp'],['cAddr','f-ca'],['cState','f-cs'],['fBill','f-bill']].forEach(([id,fid])=>{
-    const v=document.getElementById(id).value.trim();
-    const fe=document.getElementById(fid);
+    const v=document.getElementById(id).value.trim();const fe=document.getElementById(fid);
     if(!v){fe.classList.add('has-err');ok=false;}else fe.classList.remove('has-err');
   });
   return ok;
 }
+
 async function generateQuote(){
-  if(!validate()){showToast('Fill required fields!',false);return;}
-  const d=calcD();if(!d){showToast('Enter bill!',false);return;}
-  if(!window.jspdf){showToast('PDF loading...',false);return;}
-  const btn=document.getElementById('genBtn');btn.disabled=true;btn.textContent='⏳ Generating...';
+  if(!validate()){showToast('⚠ Fill all required fields!',false);return;}
+  const d=calcD();if(!d){showToast('Enter monthly bill!',false);return;}
+  const btn=document.getElementById('genBtn');
+  if(btn.disabled)return; // prevent double click
+  btn.disabled=true;btn.textContent='⏳ Generating PDF...';
   try{
     const now=new Date();
-    const qno='SQ-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
-    buildPDF(d,qno);
-    await SB.from('quotes').insert({user_id:currentUser.id,quote_number:qno,customer_name:document.getElementById('cName').value,customer_phone:document.getElementById('cPhone').value,customer_state:document.getElementById('cState').value,system_kwp:d.kWp,net_cost:d.net,annual_savings:d.netSav,payback_years:d.pb,status:'sent'});
-    showToast('✅ PDF Downloaded & Saved!');
-  }catch(e){showToast('Error: '+e.message,false);}
+    const qno='SQ-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+String(now.getSeconds()).padStart(2,'0');
+    // Build PDF as blob and use single download
+    await buildAndDownloadPDF(d,qno);
+    // Save to Supabase
+    await SB.from('quotes').insert({
+      user_id:CU.id,quote_number:qno,
+      customer_name:document.getElementById('cName').value,
+      customer_phone:document.getElementById('cPhone').value,
+      customer_address:document.getElementById('cAddr').value,
+      customer_state:document.getElementById('cState').value,
+      discom:document.getElementById('cDiscom').value,
+      system_kwp:d.kWp,gross_cost:d.gross,subsidy:d.sub,
+      net_cost:d.net,annual_savings:d.netSav,
+      payback_years:d.pb,roi_25yr:d.roi,category:d.cat,status:'sent'
+    });
+    showToast('✅ PDF Downloaded & Saved to Cloud!');
+  }catch(e){console.error(e);showToast('Error: '+e.message,false);}
   btn.disabled=false;btn.textContent='☀ Generate & Download PDF';
 }
+
 function sendWA(){
-  const d=calcD();const name=document.getElementById('cName').value;const phone=document.getElementById('cPhone').value;
+  const d=calcD();const name=document.getElementById('cName').value;
   if(!d||!name){showToast('Fill form first!',false);return;}
-  const company=currentProfile?.company_name||'SolarQuote Pro';
-  let msg=currentTemplate.wa||`Hi ${name},%0A%0AYour Solar Quote:%0A☀ *${d.kWp} kWp* System%0A💰 Investment: *${inr(d.net)}*%0A🏛 Subsidy: *${inr(d.sub)}*%0A📊 Savings: *${inr(d.netSav)}/yr*%0A⏱ Payback: *${d.pb} Yrs*%0A📈 ROI: *${d.roi}%25*%0A%0AFrom: ${company}`;
-  msg=msg.replace('{name}',name).replace('{kwp}',d.kWp).replace('{net}',inr(d.net)).replace('{sav}',inr(d.netSav)).replace('{pb}',d.pb).replace('{company}',company);
-  const ph=phone.replace(/\D/g,'');
+  const co=CP?.company_name||'SolarQuote Pro';
+  let msg=CT.wa||`Hi ${name},%0A%0AYour Solar Quote:%0A☀ *${d.kWp} kWp* System%0A💰 Investment: *${inr(d.net)}*%0A🏛 Subsidy: *${inr(d.sub)}*%0A📊 Savings: *${inr(d.netSav)}/yr*%0A⏱ Payback: *${d.pb} Yrs*%0A📈 ROI: *${d.roi}%25*%0A%0AFrom: ${co}`;
+  msg=msg.replace(/{name}/g,name).replace(/{kwp}/g,d.kWp).replace(/{net}/g,inr(d.net)).replace(/{sav}/g,inr(d.netSav)).replace(/{pb}/g,d.pb).replace(/{company}/g,co);
+  const ph=document.getElementById('cPhone').value.replace(/\D/g,'');
   window.open('https://wa.me/'+(ph.startsWith('91')?ph:'91'+ph)+'?text='+encodeURIComponent(msg),'_blank');
 }
 
-// SETTINGS
-async function saveSettings(){
-  const company=document.getElementById('sCompany').value.trim();
-  const phone=document.getElementById('sPhone').value.trim();
-  const gst=document.getElementById('sGst').value.trim();
-  const website=document.getElementById('sWeb').value.trim();
-  await SB.from('profiles').upsert({id:currentUser.id,company_name:company,phone,gst,website});
-  currentProfile={...currentProfile,company_name:company,phone,gst,website};
-  document.getElementById('navName').textContent=company||currentUser.email;
-  showToast('✅ Settings saved!');
-}
-
-// PDF
-function buildPDF(d,qno){
+// PDF — single download, no repeat
+async function buildAndDownloadPDF(d,qno){
+  // Load jsPDF dynamically only once
+  if(!window.jspdf){
+    await new Promise((res,rej)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+  }
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
   const now=new Date();
-  const dateStr=now.toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
-  const validTill=new Date(now.getTime()+30*864e5).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const ds=now.toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  const vt=new Date(now.getTime()+30*864e5).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
   const name=document.getElementById('cName').value;
   const phone=document.getElementById('cPhone').value;
   const addr=document.getElementById('cAddr').value;
   const state=document.getElementById('cState').value;
   const discom=document.getElementById('cDiscom').value||'Local DISCOM';
-  const company=currentProfile?.company_name||'SolarQuote Pro';
-  const iph=currentProfile?.phone||'';
-  const gst=currentProfile?.gst||'';
+  const co=CP?.company_name||'SolarQuote Pro';
+  const iph=CP?.phone||'';
+  const gst=CP?.gst||'';
   const panel=document.getElementById('fPanel').value;
   const inv=document.getElementById('fInverter').value;
   const phase=document.getElementById('fPhase').value;
   const nm=NM[state]||NM['Other'];
-  const hdrColor=currentTemplate.color||'#1a3370';
-  const hc=[parseInt(hdrColor.slice(1,3),16),parseInt(hdrColor.slice(3,5),16),parseInt(hdrColor.slice(5,7),16)];
-  const title=currentTemplate.title||'Professional Solar Quotation | India 2025';
-  const terms=currentTemplate.terms||'Generation may vary +/-10%. Subsidy subject to policy. Net metering subject to DISCOM. Quote valid 30 days.';
-  const payment=currentTemplate.payment||'30% Advance | 60% Before Installation | 10% After Commissioning';
+  const hx=CT.color||'#1a3370';
+  const hc=[parseInt(hx.slice(1,3),16),parseInt(hx.slice(3,5),16),parseInt(hx.slice(5,7),16)];
+  const title=CT.title||'Professional Solar Quotation | India 2025';
+  const footer=CT.footer||co+' | SolarQuote Pro India';
+  const payment=CT.payment||'30% Advance | 60% Before Installation | 10% After Commissioning';
+  const terms=CT.terms||'Generation may vary ±10%. Subsidy subject to Govt. policy. Net metering subject to DISCOM approval. Quote valid 30 days.';
   const W=210,M=12;let y=0;
   const R=(x,fy,w,h,r,g,b)=>{doc.setFillColor(r,g,b);doc.rect(x,fy,w,h,'F');};
   const T=(t,x,fy,o={})=>{doc.setFont('helvetica',o.b?'bold':'normal');doc.setFontSize(o.s||9);doc.setTextColor(...(o.c||[30,30,30]));doc.text(String(t),x,fy,{align:o.a||'left'});};
-  const L=(x1,y1,x2,y2,r=200,g=200,b=200,w=0.2)=>{doc.setDrawColor(r,g,b);doc.setLineWidth(w);doc.line(x1,y1,x2,y2);};
+  const L=(x1,y1,x2,y2,r=200,g=200,b=200,lw=0.2)=>{doc.setDrawColor(r,g,b);doc.setLineWidth(lw);doc.line(x1,y1,x2,y2);};
   R(0,0,W,28,...hc);doc.setFillColor(255,107,0);doc.circle(M+5,14,5,'F');doc.setFillColor(255,200,80);doc.circle(M+5,14,2.5,'F');
   T('SolarQuote Pro',M+13,11,{b:true,s:16,c:[255,255,255]});T(title,M+13,18,{s:7.5,c:[200,220,255]});
-  T('Quote: '+qno,W-M,10,{s:8,c:[200,220,255],a:'right'});T('Date: '+dateStr,W-M,16,{s:8,c:[200,220,255],a:'right'});T('Valid: '+validTill,W-M,22,{s:8,c:[200,220,255],a:'right'});y=32;
-  R(M,y,W-2*M,8,255,107,0);T('Prepared by: '+company+(iph?' | '+iph:'')+(gst?' | GST: '+gst:''),M+3,y+5.5,{b:true,s:7.5,c:[255,255,255]});y+=11;
+  T('Quote: '+qno,W-M,10,{s:8,c:[200,220,255],a:'right'});T('Date: '+ds,W-M,16,{s:8,c:[200,220,255],a:'right'});T('Valid Till: '+vt,W-M,22,{s:8,c:[200,220,255],a:'right'});y=32;
+  R(M,y,W-2*M,8,255,107,0);T('Prepared by: '+co+(iph?' | '+iph:'')+(gst?' | GST: '+gst:''),M+3,y+5.5,{b:true,s:7.5,c:[255,255,255]});y+=11;
   R(M,y,W-2*M,7,...hc);T('CUSTOMER DETAILS',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
   [[name,phone,'Customer Name','Phone'],[addr,state,'Address','State'],[discom,d.cat.charAt(0).toUpperCase()+d.cat.slice(1),'DISCOM','Category']].forEach(([v1,v2,l1,l2],i)=>{
     R(M,y,W-2*M,8,i%2===0?245:255,i%2===0?246:255,i%2===0?248:255);L(M,y+8,W-M,y+8);
     T(l1+':',M+3,y+5.5,{s:8,c:[130,130,130]});T(v1,M+38,y+5.5,{b:true,s:8.5});T(l2+':',M+108,y+5.5,{s:8,c:[130,130,130]});T(v2,M+138,y+5.5,{b:true,s:8.5});y+=8;
   });y+=5;
   R(M,y,W-2*M,7,...hc);T('SYSTEM SPECIFICATION',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,15,232,241,255);T('System:',M+3,y+7,{s:8,c:[100,100,130]});T(d.kWp+' kWp',M+38,y+12,{b:true,s:20,c:[255,107,0]});T(d.panels+' Panels x '+SC.panelWatt+'Wp | '+panel,M+85,y+7,{s:8.5});T('Annual: '+d.gen.toLocaleString()+' kWh/yr',M+85,y+13,{b:true,s:9,c:hc});y+=17;
-  [[panel,'25yr Warranty','Panel','Warranty'],[inv,'10yr Warranty','Inverter','Warranty'],['GI Galvanized','10yr Warranty','Structure','Warranty'],[phase==='three'?'3-Phase':'1-Phase','5yr Workmanship','Phase','Installation'],['80% at Year 25','Bi-dir meter','Performance','Net Metering']].forEach(([v1,v2,l1,l2],i)=>{
+  R(M,y,W-2*M,15,232,241,255);T('Capacity:',M+3,y+7,{s:8,c:[100,100,130]});T(d.kWp+' kWp',M+32,y+12,{b:true,s:22,c:[255,107,0]});T(d.panels+' Panels × '+SC.panelWatt+'Wp | '+panel,M+85,y+7,{s:8.5});T('Annual Generation: '+d.gen.toLocaleString()+' kWh/year',M+85,y+13,{b:true,s:9,c:hc});y+=17;
+  [[panel,'25-Year Warranty','Panel Type','Panel Warranty'],[inv,'10-Year Warranty','Inverter','Inverter Warranty'],['GI Hot-Dip Galvanized','10-Year Warranty','Structure','Warranty'],[phase==='three'?'Three Phase':'Single Phase','5-Year Workmanship','Phase','Installation'],['80% output at Year 25','Bi-directional Meter','Performance Guarantee','Net Metering']].forEach(([v1,v2,l1,l2],i)=>{
     R(M,y,W-2*M,7.5,i%2===0?245:255,i%2===0?246:255,i%2===0?248:255);L(M,y+7.5,W-M,y+7.5);
     T(l1,M+3,y+5,{s:8,c:[120,120,120]});T(v1,M+48,y+5,{s:8.5});T(l2,M+108,y+5,{s:8,c:[120,120,120]});T(v2,M+148,y+5,{s:8.5});y+=7.5;
   });y+=5;
   R(M,y,W-2*M,7,255,107,0);T('COST BREAKDOWN',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,8,245,246,248);T('Gross System Cost',M+3,y+5.5,{s:8.5});T(inr(d.gross),W-M-3,y+5.5,{b:true,s:8.5,a:'right'});y+=8;
-  if(d.sub>0){R(M,y,W-2*M,8,220,250,230);T('(-) MNRE Subsidy',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.sub),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
-  if(d.disc>0){R(M,y,W-2*M,8,220,250,230);T('(-) Discount',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.disc),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
-  L(M,y,W-M,y,...hc,1);R(M,y,W-2*M,13,255,243,220);T('NET PAYABLE (incl. GST)',M+3,y+9,{b:true,s:10.5});T(inr(d.net),W-M-3,y+9,{b:true,s:14,c:[255,107,0],a:'right'});y+=17;y+=4;
-  R(M,y,W-2*M,7,27,110,65);T('FINANCIAL ANALYSIS (25 Years)',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  [['Tariff',inr(d.tariff)+'/kWh','CO2',d.co2+'t/yr'],['Self-Use',d.self.toLocaleString()+' kWh','Trees',Math.round(d.co2*45)+'/yr'],['Export',d.expU.toLocaleString()+' kWh','Savings/yr',inr(d.sav)],['Maintenance',inr(d.maint),'Net Savings/yr',inr(d.netSav)],['Payback',d.pb+' Yrs','25yr Savings',inr(d.life)],['25yr ROI',d.roi+'%','Investment',inr(d.net)]].forEach(([l1,v1,l2,v2],i)=>{
+  R(M,y,W-2*M,8,245,246,248);T('Gross System Cost (Supply + Installation + Commissioning)',M+3,y+5.5,{s:8.5});T(inr(d.gross),W-M-3,y+5.5,{b:true,s:8.5,a:'right'});y+=8;
+  if(d.sub>0){R(M,y,W-2*M,8,220,250,230);T('(-) MNRE PM-Surya Ghar Yojana Subsidy',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.sub),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
+  if(d.disc>0){R(M,y,W-2*M,8,220,250,230);T('(-) Special Discount',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.disc),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
+  L(M,y,W-M,y,...hc,1);R(M,y,W-2*M,13,255,243,220);T('NET PAYABLE AMOUNT (incl. 12% GST)',M+3,y+9,{b:true,s:10.5});T(inr(d.net),W-M-3,y+9,{b:true,s:14,c:[255,107,0],a:'right'});y+=17;y+=4;
+  R(M,y,W-2*M,7,27,110,65);T('FINANCIAL ANALYSIS & ROI (25 Years)',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
+  [['Electricity Tariff',inr(d.tariff)+'/kWh','Annual CO₂ Avoided',d.co2+' tonnes'],['Self-Consumption',d.self.toLocaleString()+' kWh (70%)','Trees Equivalent',Math.round(d.co2*45)+' trees/yr'],['Grid Export',d.expU.toLocaleString()+' kWh','Annual Savings',inr(d.sav)],['Annual Maintenance',inr(d.maint),'Net Annual Savings',inr(d.netSav)],['Payback Period',d.pb+' Years','25-Year Savings',inr(d.life)],['25-Year ROI',d.roi+'%','Net Investment',inr(d.net)]].forEach(([l1,v1,l2,v2],i)=>{
     const last=i===5;R(M,y,W-2*M,8,last?220:i%2===0?245:255,last?250:i%2===0?246:255,last?230:i%2===0?248:255);L(M,y+8,W-M,y+8);
     T(l1,M+3,y+5.5,{s:8,c:[120,120,120]});T(v1,M+50,y+5.5,{b:last,s:last?9:8.5,c:last?[27,153,71]:[30,30,30]});
     T(l2,M+108,y+5.5,{s:8,c:[120,120,120]});T(v2,W-M-3,y+5.5,{b:last,s:last?9:8.5,c:last?[27,153,71]:[30,30,30],a:'right'});y+=8;
   });y+=5;
-  R(M,y,W-2*M,7,...hc);T('NET METERING INFO',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,20,232,241,255);T(state+': '+nm,M+3,y+5,{b:true,s:7.5,c:hc});T('Subsidy: 2kW=30k | 3kW=60k | >3kW=78k (MNRE PM-Surya Ghar)',M+3,y+11,{s:7.5});T('Subsidy via DBT after DISCOM inspection. Bi-directional meter by DISCOM.',M+3,y+17,{s:7.5});y+=23;
+  R(M,y,W-2*M,7,...hc);T('NET METERING & SUBSIDY INFO',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
+  R(M,y,W-2*M,22,232,241,255);T(state+' | '+nm,M+3,y+5,{b:true,s:7.5,c:hc});T('MNRE Subsidy: Up to 2kW=₹30,000 | 2-3kW=₹60,000 | >3kW=₹78,000 (Residential only)',M+3,y+11,{s:7.5});T('Subsidy credited via DBT after DISCOM inspection & commissioning',M+3,y+17,{s:7.5});T('Net Metering: Excess power exported to grid. Bi-directional meter installed by DISCOM.',M+3,y+21,{s:7});y+=25;
   R(M,y,W-2*M,7,255,107,0);T('PAYMENT TERMS',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,14,255,243,220);T(payment,M+3,y+5.5,{s:8.5});T('Scope: Supply, Install, Commission, DISCOM & Subsidy Processing',M+3,y+11.5,{s:8});y+=17;
-  L(M,y+12,M+65,y+12);L(W-M-65,y+12,W-M,y+12);T('Authorized Signatory',M,y+16,{s:8,c:[130,130,130]});T(company,M,y+21,{b:true,s:8.5});T('Customer Signature',W-M,y+16,{s:8,c:[130,130,130],a:'right'});T(name,W-M,y+21,{b:true,s:8.5,a:'right'});y+=26;
-  doc.setFontSize(7);doc.setTextColor(160,160,160);const lines=doc.splitTextToSize('Terms: '+terms,W-2*M);doc.text(lines,M,y);y+=8;L(M,y,W-M,y);
-  const footer=currentTemplate.footer||'SolarQuote Pro India';
-  T(footer+' | '+qno,W/2,y+5,{s:7,c:[180,180,180],a:'center'});
-  doc.save('SolarQuote_'+(name||'Quote').replace(/[^a-zA-Z0-9]/g,'_')+'_'+qno+'.pdf');
+  R(M,y,W-2*M,16,255,243,220);const plines=doc.splitTextToSize(payment,W-2*M-10);doc.text(plines,M+3,y+6);y+=Math.max(16,plines.length*5+4);
+  L(M,y+12,M+65,y+12);L(W-M-65,y+12,W-M,y+12);T('Authorized Signatory & Seal',M,y+16,{s:8,c:[130,130,130]});T(co,M,y+21,{b:true,s:8.5});T('Customer Signature & Date',W-M,y+16,{s:8,c:[130,130,130],a:'right'});T(name,W-M,y+21,{b:true,s:8.5,a:'right'});y+=27;
+  doc.setFontSize(7);doc.setTextColor(160,160,160);const tlines=doc.splitTextToSize('Terms: '+terms,W-2*M);doc.text(tlines,M,y);y+=tlines.length*3.5+4;L(M,y,W-M,y);T(footer+' | '+qno,W/2,y+5,{s:7,c:[180,180,180],a:'center'});
+  // Single download — save directly
+  const safeName=(name||'Quote').replace(/[^a-zA-Z0-9]/g,'_');
+  doc.save('SolarQuote_'+safeName+'_'+qno+'.pdf');
 }
 </script>
 </body>
