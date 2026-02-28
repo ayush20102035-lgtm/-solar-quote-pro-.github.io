@@ -2,147 +2,281 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>SolarQuote Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+:root{
+  --orange:#ff6b00;--orange2:#ff9500;--navy:#1a3370;--navy2:#0d2060;
+  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+  --bg:#f0f4ff;--white:#ffffff;--card:#ffffff;
+  --text:#1e293b;--sub:#64748b;--border:#e2e8f0;--light:#f8fafc;
+  --shadow:0 4px 24px rgba(26,51,112,0.10);
+  --radius:18px;--radius-sm:12px;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-tap-highlight-color:transparent;}
 input,select,textarea,button{font-family:inherit;}
-.auth-screen{min-height:100vh;background:linear-gradient(135deg,#0d2060,#1a3370);display:flex;align-items:center;justify-content:center;padding:20px;}
-.auth-box{background:white;border-radius:20px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-.sun{width:52px;height:52px;background:#ff6b00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 0 20px rgba(255,107,0,0.4);}
-.auth-tabs{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid #eee;margin-bottom:20px;}
-.auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;background:#fafafa;color:#888;border:none;}
-.auth-tab.active{background:#ff6b00;color:white;}
-.field{margin-bottom:14px;}
-.field label{font-size:12px;color:#666;font-weight:600;display:block;margin-bottom:5px;}
-.field input,.field select,.field textarea{width:100%;padding:11px 13px;border-radius:9px;border:1.5px solid #ddd;font-size:14px;outline:none;background:#fafafa;}
-.field input:focus,.field select:focus{border-color:#ff6b00;}
-.btn-primary{width:100%;padding:13px;border-radius:11px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,0,0.3);}
-.btn-primary:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
-.msg{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:12px;display:none;}
-.msg.ok{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;display:block;}
-.msg.err{background:#fff5f5;color:#ef4444;border:1px solid #fecaca;display:block;}
-.app{display:none;min-height:100vh;background:#f0f4ff;}
-nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.07);position:sticky;top:0;z-index:100;}
-.nav-logo{display:flex;align-items:center;gap:10px;}
-.nav-sun{width:34px;height:34px;background:#ff6b00;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;}
-.tabs{display:flex;background:white;border-bottom:1px solid #eee;overflow-x:auto;}
-.tab{padding:11px 14px;font-size:12px;font-weight:700;color:#888;border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;}
-.tab.active{color:#ff6b00;border-bottom-color:#ff6b00;}
-.card{background:white;border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:14px;}
-.sec-title{font-size:10px;font-weight:800;color:#ff6b00;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.sec-title::after{content:'';flex:1;height:1px;background:#f0f0f0;}
+
+/* ===== ONBOARDING ===== */
+.onboard{position:fixed;inset:0;z-index:1000;background:linear-gradient(160deg,var(--navy2) 0%,#0a1840 50%,#1a0a30 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.onboard-slides{width:100%;max-width:360px;}
+.slide{display:none;text-align:center;animation:slideIn 0.4s ease;}
+.slide.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.slide-icon{font-size:72px;margin-bottom:20px;filter:drop-shadow(0 0 30px rgba(255,107,0,0.5));}
+.slide h2{font-size:26px;font-weight:900;color:white;margin-bottom:12px;line-height:1.2;}
+.slide p{font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7;}
+.dots{display:flex;justify-content:center;gap:8px;margin:28px 0 20px;}
+.dot{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,0.25);transition:all 0.3s;}
+.dot.active{width:24px;background:var(--orange);}
+.btn-next{width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:white;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,0,0.4);letter-spacing:0.3px;}
+.btn-skip{margin-top:14px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;padding:8px;}
+
+/* ===== AUTH ===== */
+.auth-screen{min-height:100vh;background:linear-gradient(160deg,var(--navy2),#0a1840,#1a0a30);display:flex;align-items:center;justify-content:center;padding:20px;}
+.auth-box{background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-radius:24px;padding:36px 28px;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,0.35);}
+.auth-hero{text-align:center;margin-bottom:28px;}
+.auth-sun{width:60px;height:60px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;box-shadow:0 8px 28px rgba(255,107,0,0.4);}
+.auth-tabs{display:flex;border-radius:12px;overflow:hidden;border:2px solid var(--border);margin-bottom:22px;padding:3px;background:var(--light);gap:3px;}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--sub);border:none;border-radius:9px;transition:all 0.2s;}
+.auth-tab.active{background:white;color:var(--orange);box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.field{margin-bottom:16px;}
+.field label{font-size:12px;color:var(--sub);font-weight:700;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+.field input{width:100%;padding:14px 16px;border-radius:12px;border:2px solid var(--border);font-size:15px;outline:none;background:var(--light);color:var(--text);transition:all 0.2s;}
+.field input:focus{border-color:var(--orange);background:white;box-shadow:0 0 0 4px rgba(255,107,0,0.08);}
+.btn-auth{width:100%;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:white;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,0,0.35);transition:transform 0.15s;}
+.btn-auth:active{transform:scale(0.98);}
+.btn-auth:disabled{background:#d1d5db;box-shadow:none;cursor:not-allowed;}
+.amsg{padding:12px 16px;border-radius:10px;font-size:13px;font-weight:700;margin-bottom:14px;display:none;}
+.amsg.ok{background:#f0fdf4;color:#16a34a;border:2px solid #bbf7d0;display:block;}
+.amsg.err{background:#fff5f5;color:var(--red);border:2px solid #fecaca;display:block;}
+
+/* ===== APP ===== */
+.app{display:none;min-height:100vh;background:var(--bg);}
+nav{background:white;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(26,51,112,0.08);position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:12px;}
+.nav-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(255,107,0,0.3);}
+.nav-name{font-weight:800;color:var(--navy);font-size:15px;line-height:1.1;}
+.nav-sub{font-size:10px;color:var(--sub);}
+.nav-actions{display:flex;gap:8px;}
+.nav-btn{width:38px;height:38px;border-radius:12px;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;position:relative;transition:all 0.2s;}
+.nav-btn:active{background:var(--light);}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid white;}
+
+/* TABS */
+.tabs{display:flex;background:white;border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 4px;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:14px 16px;font-size:12px;font-weight:700;color:var(--sub);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;letter-spacing:0.3px;}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+
+/* PAGES */
+.page{display:none;padding:16px 14px;}
+.page.active{display:block;}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:14px;border:1px solid rgba(255,255,255,0.8);}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sec-label{font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:2px;}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.stat-box{background:white;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden;}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;}
+.stat-box.s1::before{background:linear-gradient(90deg,var(--orange),var(--orange2));}
+.stat-box.s2::before{background:linear-gradient(90deg,var(--navy),#4a6fa5);}
+.stat-box.s3::before{background:linear-gradient(90deg,var(--green),#86efac);}
+.stat-box.s4::before{background:linear-gradient(90deg,var(--yellow),#fcd34d);}
+.stat-label{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;}
+.stat-val{font-size:22px;font-weight:900;line-height:1;}
+
+/* QUOTE FORM */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .full{grid-column:1/-1;}
-.finp label{font-size:11px;color:#888;display:block;margin-bottom:4px;}
-.finp input,.finp select,.finp textarea{width:100%;padding:10px 11px;border-radius:8px;border:1.5px solid #ddd;font-size:13px;outline:none;background:#fafafa;}
-.finp input:focus,.finp select:focus,.finp textarea:focus{border-color:#ff6b00;background:white;}
+.finp{margin-bottom:2px;}
+.finp label{font-size:11px;color:var(--sub);display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;}
+.finp input,.finp select,.finp textarea{width:100%;padding:13px 14px;border-radius:12px;border:2px solid var(--border);font-size:14px;outline:none;background:var(--light);color:var(--text);transition:all 0.2s;}
+.finp input:focus,.finp select:focus,.finp textarea:focus{border-color:var(--orange);background:white;box-shadow:0 0 0 4px rgba(255,107,0,0.08);}
 .finp textarea{resize:none;}
-.finp .err-msg{font-size:11px;color:#f55;margin-top:3px;display:none;}
-.finp.has-err input,.finp.has-err select,.finp.has-err textarea{border-color:#f55;background:#fff5f5;}
-.finp.has-err .err-msg{display:block;}
-.seg{display:flex;border-radius:8px;overflow:hidden;border:1.5px solid #ddd;}
-.seg button{flex:1;padding:9px 4px;font-size:11px;font-weight:700;border:none;cursor:pointer;background:#fafafa;color:#888;}
-.seg button.active{background:#ff6b00;color:white;}
-.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.metric{background:#f7f8fa;border:1px solid #eee;border-radius:10px;padding:10px 12px;}
-.ml{font-size:9px;color:#bbb;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
-.mv{font-size:16px;font-weight:800;line-height:1;}
-.ms{font-size:10px;color:#ccc;margin-top:2px;}
-.subsidy-box{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.roi-bar{background:#f7f8fa;border-radius:10px;padding:10px 12px;margin-bottom:8px;}
-.bar-track{height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-top:5px;}
-.bar-fill{height:100%;background:linear-gradient(90deg,#ff6b00,#fbbf24);border-radius:3px;transition:width 0.8s;}
-.gen-btns{display:flex;gap:10px;margin-top:4px;}
-.btn-gen{flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#ff6b00,#ff9500);color:white;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(255,107,0,0.3);}
-.btn-gen:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;}
-.btn-wa{padding:14px 16px;border-radius:12px;border:none;background:#25D366;color:white;font-size:18px;cursor:pointer;}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.stat-box{background:white;border-radius:12px;padding:14px 16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
-.stat-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.stat-val{font-size:20px;font-weight:800;}
-.quote-item{padding:14px;border-bottom:1px solid #f0f0f0;}
+.finp .ferr{font-size:11px;color:var(--red);margin-top:4px;display:none;font-weight:600;}
+.finp.has-err input,.finp.has-err select,.finp.has-err textarea{border-color:var(--red);background:#fff5f5;}
+.finp.has-err .ferr{display:block;}
+
+.seg{display:flex;border-radius:12px;overflow:hidden;border:2px solid var(--border);background:var(--light);padding:3px;gap:3px;}
+.seg button{flex:1;padding:10px 4px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--sub);border-radius:9px;transition:all 0.2s;}
+.seg button.active{background:white;color:var(--orange);box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+
+/* LIVE CALC */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.metric{background:var(--light);border:2px solid var(--border);border-radius:12px;padding:12px 14px;transition:all 0.3s;}
+.ml{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:700;}
+.mv{font-size:18px;font-weight:900;line-height:1;}
+.ms{font-size:10px;color:#cbd5e1;margin-top:3px;}
+.subsidy-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #bbf7d0;border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.roi-bar{background:var(--light);border-radius:12px;padding:12px 14px;margin-bottom:10px;border:2px solid var(--border);}
+.bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:6px;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--yellow));border-radius:4px;transition:width 0.8s;}
+
+/* BUTTONS */
+.gen-btns{display:flex;gap:12px;margin-top:8px;}
+.btn-gen{flex:1;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:white;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,0,0.35);transition:all 0.2s;letter-spacing:0.3px;}
+.btn-gen:active{transform:scale(0.97);}
+.btn-gen:disabled{background:#d1d5db;box-shadow:none;cursor:not-allowed;}
+.btn-wa{width:56px;height:56px;border-radius:16px;border:none;background:#25D366;color:white;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(37,211,102,0.3);flex-shrink:0;}
+
+/* QUOTE LIST */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-inp{width:100%;padding:13px 14px 13px 42px;border-radius:14px;border:2px solid var(--border);font-size:14px;outline:none;background:white;color:var(--text);transition:all 0.2s;}
+.search-inp:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,107,0,0.08);}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--sub);}
+.filter-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.filter-row::-webkit-scrollbar{display:none;}
+.filter-chip{padding:7px 14px;border-radius:20px;border:2px solid var(--border);background:white;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.filter-chip.active{background:var(--orange);border-color:var(--orange);color:white;}
+
+.quote-item{padding:16px;border-bottom:1px solid var(--border);}
 .quote-item:last-child{border-bottom:none;}
-.qi-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
-.qi-btn{padding:5px 11px;border-radius:7px;border:none;font-size:11px;font-weight:700;cursor:pointer;}
+.qi-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.qi-btn{padding:8px 14px;border-radius:10px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.qi-btn:active{transform:scale(0.96);}
 .qi-btn.wa{background:#25D366;color:white;}
-.qi-btn.reminder{background:#fff8f0;color:#ff6b00;border:1px solid #ffe4c4;}
-.qi-btn.del{background:#fff0f0;color:#ef4444;border:1px solid #fecaca;}
-.qi-btn.status{background:#f0f4ff;color:#1a3370;border:1px solid #c7d7ff;}
-.plan-badge{padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.plan-free{background:#fff8f0;color:#ff6b00;}
-.plan-pro{background:#f0f4ff;color:#1a3370;}
+.qi-btn.rem{background:#fff8f0;color:var(--orange);border:2px solid #ffe4c4;}
+.qi-btn.st{background:#f0f4ff;color:var(--navy);border:2px solid #c7d7ff;}
+.qi-btn.del{background:#fff0f0;color:var(--red);border:2px solid #fecaca;}
+
+/* BADGES */
+.plan-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800;}
+.plan-free{background:#fff8f0;color:var(--orange);}
+.plan-pro{background:#f0f4ff;color:var(--navy);}
 .plan-business{background:#f0fdf4;color:#16a34a;}
-.status-badge{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;}
-.s-sent{background:#f0f4ff;color:#1a3370;}
-.s-followup{background:#fff8f0;color:#ff6b00;}
+.status-badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;}
+.s-sent{background:#f0f4ff;color:var(--navy);}
+.s-followup{background:#fff8f0;color:var(--orange);}
 .s-closed{background:#f0fdf4;color:#16a34a;}
-.s-lost{background:#fff5f5;color:#ef4444;}
-.page{display:none;padding:16px;}
-.page.active{display:block;}
-.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;padding:11px 20px;border-radius:12px;font-weight:700;font-size:13px;color:white;display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
-.toast.show{display:block;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
+.s-lost{background:#fff5f5;color:var(--red);}
+
+/* REMINDERS */
+.rem-item{padding:14px;background:#fff8f0;border-radius:14px;border:2px solid #ffe4c4;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.rem-item.due{background:#fff0f0;border-color:#fecaca;}
+
+/* TEMPLATE */
+.clr-swatch{width:38px;height:38px;border-radius:10px;cursor:pointer;border:3px solid transparent;transition:all 0.2s;flex-shrink:0;}
+.clr-swatch.selected{border-color:var(--orange);transform:scale(1.15);}
+
+/* LOGO UPLOAD */
+.logo-upload{border:2px dashed var(--border);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--light);}
+.logo-upload:hover{border-color:var(--orange);background:#fff8f0;}
+.logo-preview{width:100%;max-height:80px;object-fit:contain;border-radius:8px;margin-top:10px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:200;display:none;align-items:flex-end;justify-content:center;padding:0;}
 .modal-overlay.show{display:flex;}
-.modal{background:white;border-radius:18px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
-.notif-dot{width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block;margin-left:3px;vertical-align:top;}
-.admin-msg-card{background:#f0f4ff;border:1.5px solid #c7d7ff;border-radius:12px;padding:14px;margin-bottom:14px;}
-.reminder-item{padding:12px 14px;background:#fff8f0;border-radius:10px;border:1px solid #ffe4c4;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.clr-swatch{width:34px;height:34px;border-radius:8px;cursor:pointer;border:3px solid transparent;flex-shrink:0;}
-.clr-swatch.selected{border-color:#ff6b00 !important;}
-@media(max-width:400px){.grid2{grid-template-columns:1fr;}.gen-btns{flex-direction:column;}}
+.modal{background:white;border-radius:24px 24px 0 0;padding:24px 20px 36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.modal h3{font-size:17px;font-weight:800;color:var(--navy);margin-bottom:18px;}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;padding:12px 24px;border-radius:14px;font-weight:800;font-size:13px;color:white;display:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.toast.show{display:block;animation:toastIn 0.3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
+/* ADMIN MSG */
+.admin-msg-card{background:linear-gradient(135deg,#f0f4ff,#e8eeff);border:2px solid #c7d7ff;border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 20px;}
+.empty-icon{font-size:56px;margin-bottom:14px;filter:grayscale(0.3);}
+
+@media(max-width:400px){.grid2{grid-template-columns:1fr;}.stat-grid{grid-template-columns:1fr 1fr;}}
+@media(min-width:600px){.page{padding:20px;}.card{border-radius:22px;}.gen-btns{gap:16px;}}
 </style>
 </head>
 <body>
 
+<!-- ONBOARDING -->
+<div id="onboard" class="onboard" style="display:none;">
+  <div class="onboard-slides">
+    <div class="slide active" id="sl0">
+      <div class="slide-icon">☀️</div>
+      <h2>SolarQuote Pro mein aapka swagat hai!</h2>
+      <p>India ke solar installers ke liye banaya gaya — professional quotations sirf 2 minute mein</p>
+    </div>
+    <div class="slide" id="sl1">
+      <div class="slide-icon">📄</div>
+      <h2>Professional PDF Quotes</h2>
+      <p>Aapke company logo ke saath beautiful PDF banao aur WhatsApp pe turant bhejo</p>
+    </div>
+    <div class="slide" id="sl2">
+      <div class="slide-icon">☁️</div>
+      <h2>Cloud Sync — Har Device Pe</h2>
+      <p>Aapke saare quotes cloud mein safe hain — mobile, laptop, kaheen bhi access karo</p>
+    </div>
+    <div class="slide" id="sl3">
+      <div class="slide-icon">🔔</div>
+      <h2>Follow-up Reminders</h2>
+      <p>Kabhi bhi koi customer mat bhoolo — reminders set karo aur deals close karo!</p>
+    </div>
+  </div>
+  <div class="dots">
+    <div class="dot active" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+  </div>
+  <button class="btn-next" id="nextBtn" onclick="nextSlide()">Aage Chalein →</button>
+  <button class="btn-skip" onclick="finishOnboard()">Skip</button>
+</div>
+
+<!-- AUTH -->
 <div class="auth-screen" id="authScreen">
   <div class="auth-box">
-    <div style="text-align:center;margin-bottom:24px;">
-      <div class="sun">☀</div>
-      <h2 style="font-size:20px;color:#1a3370;font-weight:800;">SolarQuote Pro</h2>
-      <p style="font-size:12px;color:#888;margin-top:2px;" id="authSub">Sign in to continue</p>
+    <div class="auth-hero">
+      <div class="auth-sun">☀</div>
+      <h2 style="font-size:22px;font-weight:900;color:var(--navy);">SolarQuote Pro</h2>
+      <p style="font-size:13px;color:var(--sub);margin-top:4px;" id="authSub">Apne account mein login karein</p>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuth('login')">Login</button>
       <button class="auth-tab" onclick="switchAuth('signup')">Sign Up Free</button>
     </div>
-    <div id="authMsg" class="msg"></div>
+    <div id="authMsg" class="amsg"></div>
     <div id="signupExtra" style="display:none;">
-      <div class="field"><label>Company / Your Name</label><input id="aCompany" placeholder="ABC Solar Pvt Ltd"/></div>
-      <div class="field"><label>Phone</label><input id="aPhone" placeholder="+91-98765-43210"/></div>
+      <div class="field"><label>Company / Aapka Naam</label><input id="aCompany" placeholder="ABC Solar Pvt Ltd"/></div>
+      <div class="field"><label>Phone</label><input id="aPhone" placeholder="+91-98765-43210" type="tel"/></div>
     </div>
-    <div class="field"><label>Email</label><input type="email" id="aEmail" placeholder="you@example.com"/></div>
+    <div class="field"><label>Email</label><input type="email" id="aEmail" placeholder="aap@example.com"/></div>
     <div class="field"><label>Password</label><input type="password" id="aPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAuth()"/></div>
-    <button class="btn-primary" id="authBtn" onclick="doAuth()">Login</button>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:#aaa;">☁️ Secure cloud sync • All devices</div>
+    <button class="btn-auth" id="authBtn" onclick="doAuth()">Login →</button>
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--sub);">🔒 Secure • ☁️ Cloud Sync • 📱 All Devices</div>
   </div>
 </div>
 
+<!-- MAIN APP -->
 <div class="app" id="mainApp">
   <nav>
     <div class="nav-logo">
-      <div class="nav-sun">☀</div>
+      <div class="nav-icon">☀</div>
       <div>
-        <div style="font-weight:800;color:#1a3370;font-size:14px;">SolarQuote Pro</div>
-        <div style="font-size:10px;color:#888;" id="navName">...</div>
+        <div class="nav-name" id="navName">SolarQuote Pro</div>
+        <div class="nav-sub" id="navSub">Loading...</div>
       </div>
     </div>
-    <div style="display:flex;gap:6px;">
-      <button onclick="showPage('reminders')" style="padding:7px 10px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-size:13px;position:relative;">
+    <div class="nav-actions">
+      <button class="nav-btn" onclick="showPage('reminders')" title="Reminders">
         🔔<span id="reminderDot" class="notif-dot" style="display:none;"></span>
       </button>
-      <button onclick="showPage('settings')" style="padding:7px 10px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-size:13px;">⚙</button>
-      <button onclick="doLogout()" style="padding:7px 12px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-size:12px;font-weight:700;color:#666;">Exit</button>
+      <button class="nav-btn" onclick="showPage('settings')" title="Settings">⚙️</button>
+      <button class="nav-btn" onclick="doLogout()" title="Logout">🚪</button>
     </div>
   </nav>
   <div class="tabs">
     <button class="tab active" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="tab" onclick="showPage('quote')">+ New Quote</button>
+    <button class="tab" onclick="showPage('quote')">✨ New Quote</button>
     <button class="tab" onclick="showPage('reminders')">🔔 Followups</button>
     <button class="tab" onclick="showPage('template')">🎨 Template</button>
-    <button class="tab" onclick="showPage('settings')">⚙ Settings</button>
+    <button class="tab" onclick="showPage('settings')">⚙️ Settings</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -150,17 +284,29 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
     <div style="max-width:620px;margin:0 auto;">
       <div id="adminMsgArea"></div>
       <div class="stat-grid">
-        <div class="stat-box"><div class="stat-label">Total Quotes</div><div class="stat-val" id="stTotal" style="color:#ff6b00">—</div></div>
-        <div class="stat-box"><div class="stat-label">This Month</div><div class="stat-val" id="stMonth" style="color:#1a3370">—</div></div>
-        <div class="stat-box"><div class="stat-label">Total Value</div><div class="stat-val" id="stValue" style="color:#22c55e;font-size:14px">—</div></div>
-        <div class="stat-box"><div class="stat-label">My Plan</div><div class="stat-val" id="stPlan" style="font-size:13px">—</div></div>
+        <div class="stat-box s1"><div class="stat-label">Total Quotes</div><div class="stat-val" id="stTotal" style="color:var(--orange)">—</div></div>
+        <div class="stat-box s2"><div class="stat-label">This Month</div><div class="stat-val" id="stMonth" style="color:var(--navy)">—</div></div>
+        <div class="stat-box s3"><div class="stat-label">Total Value</div><div class="stat-val" id="stValue" style="color:var(--green);font-size:15px">—</div></div>
+        <div class="stat-box s4"><div class="stat-label">My Plan</div><div class="stat-val" id="stPlan" style="font-size:13px">—</div></div>
+      </div>
+      <!-- SEARCH & FILTER -->
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-inp" id="dashSearch" placeholder="Customer naam ya state search karein..." oninput="filterQuotes()"/>
+      </div>
+      <div class="filter-row">
+        <div class="filter-chip active" onclick="setFilter('all',this)">All</div>
+        <div class="filter-chip" onclick="setFilter('sent',this)">📤 Sent</div>
+        <div class="filter-chip" onclick="setFilter('followup',this)">🔔 Follow-up</div>
+        <div class="filter-chip" onclick="setFilter('closed',this)">✅ Closed</div>
+        <div class="filter-chip" onclick="setFilter('lost',this)">❌ Lost</div>
       </div>
       <div class="card" style="padding:0;overflow:hidden;">
-        <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-weight:800;color:#1a3370;font-size:14px;">📋 My Quotes</div>
-          <button onclick="showPage('quote')" style="font-size:12px;color:#ff6b00;font-weight:700;background:none;border:none;cursor:pointer;">+ New</button>
+        <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-weight:800;color:var(--navy);font-size:15px;">📋 My Quotes</div>
+          <button onclick="showPage('quote')" style="font-size:13px;color:var(--orange);font-weight:800;background:none;border:none;cursor:pointer;padding:4px 8px;">+ New</button>
         </div>
-        <div id="quoteList"><div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">Loading...</div></div>
+        <div id="quoteList"><div style="text-align:center;padding:30px;color:var(--sub);font-size:13px;">Loading...</div></div>
       </div>
     </div>
   </div>
@@ -169,23 +315,23 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
   <div class="page" id="page-quote">
     <div style="max-width:620px;margin:0 auto;">
       <div class="card">
-        <div class="sec-title">👤 Customer Info</div>
+        <div class="card-header"><span class="sec-label">👤 Customer Info</span></div>
         <div class="grid2">
-          <div class="finp" id="f-cn"><label>Name *</label><input id="cName" placeholder="Ramesh Kumar"/><div class="err-msg">Required</div></div>
-          <div class="finp" id="f-cp"><label>Phone *</label><input id="cPhone" placeholder="+91-98765-43210"/><div class="err-msg">Required</div></div>
-          <div class="finp full" id="f-ca"><label>Address *</label><textarea id="cAddr" rows="2" placeholder="Plot 12, Sector 15, Mumbai..."></textarea><div class="err-msg">Required</div></div>
+          <div class="finp" id="f-cn"><label>Name *</label><input id="cName" placeholder="Ramesh Kumar"/><div class="ferr">Required</div></div>
+          <div class="finp" id="f-cp"><label>Phone *</label><input id="cPhone" placeholder="+91-98765-43210" type="tel"/><div class="ferr">Required</div></div>
+          <div class="finp full" id="f-ca"><label>Address *</label><textarea id="cAddr" rows="2" placeholder="Plot 12, Sector 15, Mumbai..."></textarea><div class="ferr">Required</div></div>
           <div class="finp" id="f-cs"><label>State *</label>
             <select id="cState" onchange="liveCalc()"><option value="">Select State...</option>
               <option>Maharashtra</option><option>Gujarat</option><option>Rajasthan</option><option>Tamil Nadu</option><option>Karnataka</option><option>Delhi</option><option>Uttar Pradesh</option><option>Telangana</option><option>Haryana</option><option>Punjab</option><option>Madhya Pradesh</option><option>Andhra Pradesh</option><option>West Bengal</option><option>Bihar</option><option>Odisha</option><option>Other</option>
-            </select><div class="err-msg">Required</div>
+            </select><div class="ferr">Required</div>
           </div>
-          <div class="finp"><label>DISCOM</label><input id="cDiscom" placeholder="MSEDCL, BSES, BESCOM..."/></div>
+          <div class="finp"><label>DISCOM</label><input id="cDiscom" placeholder="MSEDCL, BSES..."/></div>
         </div>
       </div>
       <div class="card">
-        <div class="sec-title">⚡ System Details</div>
+        <div class="card-header"><span class="sec-label">⚡ System Details</span></div>
         <div class="grid2">
-          <div class="finp" id="f-bill"><label>Monthly Bill (₹) *</label><input type="number" id="fBill" placeholder="5000" oninput="liveCalc()"/><div class="err-msg">Enter valid amount</div></div>
+          <div class="finp" id="f-bill"><label>Monthly Bill (₹) *</label><input type="number" id="fBill" placeholder="5000" oninput="liveCalc()"/><div class="ferr">Enter amount</div></div>
           <div class="finp"><label>Tariff ₹/kWh</label><input type="number" id="fTariff" value="7" step="0.5" oninput="liveCalc()"/></div>
           <div class="finp"><label>Roof Area (sqft)</label><input type="number" id="fRoof" placeholder="Optional" oninput="liveCalc()"/></div>
           <div class="finp"><label>Phase</label><select id="fPhase"><option value="single">Single Phase</option><option value="three">Three Phase</option></select></div>
@@ -203,14 +349,14 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
         </div>
       </div>
       <div class="card">
-        <div class="sec-title">📊 Live Estimate</div>
-        <div id="livePanel"><div style="text-align:center;padding:20px;color:#ccc;"><div style="font-size:32px;">☀</div><div style="font-size:12px;margin-top:6px;">Enter monthly bill to see estimate</div></div></div>
+        <div class="card-header"><span class="sec-label">📊 Live Estimate</span></div>
+        <div id="livePanel"><div class="empty-state" style="padding:24px 0;"><div class="empty-icon">☀️</div><div style="font-size:13px;color:var(--sub);">Monthly bill enter karein</div></div></div>
       </div>
       <div class="gen-btns">
         <button class="btn-gen" id="genBtn" onclick="generateQuote()">☀ Generate & Download PDF</button>
         <button class="btn-wa" onclick="sendWA()">📱</button>
       </div>
-      <div style="text-align:center;font-size:11px;color:#bbb;margin-top:8px;">☁️ Quote auto-saved to cloud after PDF</div>
+      <div style="text-align:center;font-size:11px;color:var(--sub);margin-top:10px;">☁️ Quote auto-saved to cloud after PDF generation</div>
     </div>
   </div>
 
@@ -218,16 +364,16 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
   <div class="page" id="page-reminders">
     <div style="max-width:620px;margin:0 auto;">
       <div class="card">
-        <div class="sec-title">🔔 Follow-up Reminders</div>
-        <div id="reminderList"><div style="text-align:center;padding:20px;color:#aaa;">Loading...</div></div>
+        <div class="card-header"><span class="sec-label">🔔 Follow-up Reminders</span></div>
+        <div id="reminderList"><div style="text-align:center;padding:20px;color:var(--sub);">Loading...</div></div>
       </div>
-      <div class="card" style="background:#fff8f0;border:1.5px solid #ffe4c4;">
-        <div style="font-size:12px;color:#666;line-height:2;">
-          <b style="color:#ff6b00;">💡 Follow-up Strategy:</b><br/>
-          📞 Day 1-2: Confirm quote received<br/>
-          📞 Day 3-5: Discuss queries<br/>
-          🏠 Day 7: Propose site visit<br/>
-          ✅ Day 14: Close the deal!
+      <div class="card" style="background:linear-gradient(135deg,#fff8f0,#fff3e6);border:2px solid #ffe4c4;">
+        <div style="font-size:12px;color:#92400e;line-height:2.2;font-weight:600;">
+          💡 <b>Follow-up Strategy:</b><br/>
+          📞 Day 1-2: Quote receive confirm karein<br/>
+          📞 Day 3-5: Queries discuss karein<br/>
+          🏠 Day 7: Site visit propose karein<br/>
+          ✅ Day 14: Deal close karein!
         </div>
       </div>
     </div>
@@ -237,14 +383,28 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
   <div class="page" id="page-template">
     <div style="max-width:620px;margin:0 auto;">
       <div class="card">
-        <div class="sec-title">🎨 PDF Template Customize</div>
+        <div class="card-header"><span class="sec-label">🖼 Company Logo (PDF mein)</span></div>
+        <div class="logo-upload" onclick="document.getElementById('logoFile').click()">
+          <div style="font-size:32px;">🏢</div>
+          <div style="font-size:13px;color:var(--sub);margin-top:8px;font-weight:600;">Logo upload karein</div>
+          <div style="font-size:11px;color:#cbd5e1;margin-top:4px;">PNG, JPG • Max 500KB</div>
+          <img id="logoPreview" class="logo-preview" style="display:none;"/>
+        </div>
+        <input type="file" id="logoFile" accept="image/*" style="display:none;" onchange="handleLogo(this)"/>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button onclick="saveLogo()" style="flex:1;padding:11px;border-radius:10px;border:none;background:var(--orange);color:white;font-weight:800;cursor:pointer;font-size:13px;">💾 Save Logo</button>
+          <button onclick="clearLogo()" style="padding:11px 16px;border-radius:10px;border:2px solid var(--border);background:white;color:var(--sub);font-weight:700;cursor:pointer;font-size:13px;">Clear</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="sec-label">🎨 PDF Customize</span></div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div class="finp"><label>Quote Header Title</label><input id="tTitle" placeholder="Professional Solar Quotation | India 2025"/></div>
           <div class="finp"><label>Company Tagline (PDF footer)</label><input id="tFooter" placeholder="India ka Trusted Solar Partner"/></div>
           <div class="finp"><label>Custom Payment Terms</label><textarea id="tPayment" rows="2" placeholder="30% Advance | 60% Before Install | 10% After..."></textarea></div>
           <div class="finp"><label>Extra Terms & Conditions</label><textarea id="tTerms" rows="2" placeholder="Additional warranty or service terms..."></textarea></div>
           <div>
-            <label style="font-size:11px;color:#888;display:block;margin-bottom:8px;">PDF Header Color</label>
+            <label style="font-size:11px;color:var(--sub);display:block;margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">PDF Header Color</label>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
               <div class="clr-swatch selected" style="background:#1a3370;" onclick="setClr('#1a3370',this)"></div>
               <div class="clr-swatch" style="background:#0d6b2e;" onclick="setClr('#0d6b2e',this)"></div>
@@ -254,11 +414,12 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
               <div class="clr-swatch" style="background:#1a5a5a;" onclick="setClr('#1a5a5a',this)"></div>
             </div>
           </div>
-          <div class="finp"><label>WhatsApp Message Template</label>
-            <textarea id="tWA" rows="4" placeholder="Hi {name}, Aapka solar quote ready hai! System: {kwp} kWp, Cost: {net}..."></textarea>
-            <div style="font-size:10px;color:#aaa;margin-top:4px;">Variables: {name} {kwp} {net} {sav} {pb} {company}</div>
+          <div class="finp">
+            <label>WhatsApp Template</label>
+            <textarea id="tWA" rows="3" placeholder="Hi {name}, aapka quote ready hai! System: {kwp} kWp..."></textarea>
+            <div style="font-size:10px;color:var(--sub);margin-top:4px;">Variables: {name} {kwp} {net} {sav} {pb} {company}</div>
           </div>
-          <button class="btn-primary" onclick="saveTemplate()">💾 Save Template</button>
+          <button onclick="saveTemplate()" style="padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:white;font-weight:800;cursor:pointer;font-size:14px;box-shadow:0 6px 20px rgba(255,107,0,0.3);">💾 Save Template</button>
         </div>
       </div>
     </div>
@@ -268,23 +429,23 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
   <div class="page" id="page-settings">
     <div style="max-width:500px;margin:0 auto;">
       <div class="card">
-        <div class="sec-title">🏢 Company Profile</div>
+        <div class="card-header"><span class="sec-label">🏢 Company Profile</span></div>
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div class="finp"><label>Company / Installer Name</label><input id="sCompany" placeholder="ABC Solar Pvt Ltd"/></div>
-          <div class="finp"><label>Phone Number</label><input id="sPhone" placeholder="+91-99999-00000"/></div>
+          <div class="finp"><label>Phone Number</label><input id="sPhone" placeholder="+91-99999-00000" type="tel"/></div>
           <div class="finp"><label>GST Number</label><input id="sGst" placeholder="27XXXXX1234X1ZX"/></div>
           <div class="finp"><label>Website</label><input id="sWeb" placeholder="www.abcsolar.in"/></div>
-          <button class="btn-primary" onclick="saveSettings()">💾 Save Company Profile</button>
+          <button onclick="saveSettings()" style="padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--orange),var(--orange2));color:white;font-weight:800;cursor:pointer;font-size:14px;box-shadow:0 6px 20px rgba(255,107,0,0.3);">💾 Save Company Profile</button>
         </div>
       </div>
       <div class="card">
-        <div class="sec-title">👤 My Account</div>
-        <div style="font-size:13px;color:#555;line-height:2.2;">
+        <div class="card-header"><span class="sec-label">👤 My Account</span></div>
+        <div style="font-size:13px;color:var(--text);line-height:2.4;">
           <div>Email: <b id="settEmail">—</b></div>
           <div>Plan: <span id="settPlan" class="plan-badge plan-free">Free</span></div>
-          <div style="font-size:11px;color:#aaa;margin-top:4px;">Data securely synced to cloud ☁️</div>
+          <div style="font-size:11px;color:var(--sub);margin-top:4px;">Data securely synced to cloud ☁️</div>
         </div>
-        <button onclick="doLogout()" style="margin-top:14px;width:100%;padding:11px;border-radius:9px;border:1.5px solid #ddd;background:white;color:#666;font-weight:700;cursor:pointer;font-size:13px;">🚪 Logout</button>
+        <button onclick="doLogout()" style="margin-top:16px;width:100%;padding:13px;border-radius:12px;border:2px solid var(--border);background:white;color:var(--sub);font-weight:700;cursor:pointer;font-size:13px;">🚪 Logout</button>
       </div>
     </div>
   </div>
@@ -292,25 +453,27 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 
 <!-- REMINDER MODAL -->
 <div class="modal-overlay" id="reminderModal">
-  <div class="modal">
-    <h3 style="font-size:16px;font-weight:800;color:#1a3370;margin-bottom:16px;">🔔 Set Follow-up Reminder</h3>
-    <div class="field"><label>Customer</label><input id="rName" readonly style="background:#f5f5f5;"/></div>
+  <div class="modal" style="max-width:480px;margin:0 auto;">
+    <div class="modal-handle"></div>
+    <h3>🔔 Follow-up Reminder Set Karein</h3>
+    <div class="field"><label>Customer</label><input id="rName" readonly style="background:var(--light);"/></div>
     <div class="field"><label>Reminder Date</label><input type="date" id="rDate"/></div>
-    <div class="field"><label>Note</label><textarea id="rNote" rows="2" placeholder="Call regarding quotation approval..."></textarea></div>
+    <div class="field"><label>Note</label><textarea id="rNote" rows="2" style="width:100%;padding:13px;border-radius:12px;border:2px solid var(--border);font-size:14px;outline:none;" placeholder="Call regarding quotation..."></textarea></div>
     <div style="display:flex;gap:10px;">
-      <button onclick="saveReminder()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#ff6b00;color:white;font-weight:800;cursor:pointer;">Save</button>
-      <button onclick="closeModal('reminderModal')" style="padding:12px 18px;border-radius:10px;border:1.5px solid #ddd;background:white;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="saveReminder()" style="flex:1;padding:14px;border-radius:12px;border:none;background:var(--orange);color:white;font-weight:800;cursor:pointer;font-size:14px;">Save</button>
+      <button onclick="closeModal('reminderModal')" style="padding:14px 18px;border-radius:12px;border:2px solid var(--border);background:white;font-weight:700;cursor:pointer;font-size:14px;">Cancel</button>
     </div>
   </div>
 </div>
 
 <!-- STATUS MODAL -->
 <div class="modal-overlay" id="statusModal">
-  <div class="modal">
-    <h3 style="font-size:16px;font-weight:800;color:#1a3370;margin-bottom:16px;">📊 Update Quote Status</h3>
+  <div class="modal" style="max-width:480px;margin:0 auto;">
+    <div class="modal-handle"></div>
+    <h3>📊 Quote Status Update</h3>
     <input type="hidden" id="statusQId"/>
     <div class="field"><label>Status</label>
-      <select id="statusSel" style="width:100%;padding:11px;border-radius:9px;border:1.5px solid #ddd;font-size:14px;outline:none;">
+      <select id="statusSel" style="width:100%;padding:13px;border-radius:12px;border:2px solid var(--border);font-size:14px;outline:none;background:var(--light);">
         <option value="sent">📤 Sent</option>
         <option value="followup">🔔 Follow-up Pending</option>
         <option value="closed">✅ Closed — Won!</option>
@@ -318,8 +481,8 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
       </select>
     </div>
     <div style="display:flex;gap:10px;">
-      <button onclick="saveStatus()" style="flex:1;padding:12px;border-radius:10px;border:none;background:#1a3370;color:white;font-weight:800;cursor:pointer;">Update</button>
-      <button onclick="closeModal('statusModal')" style="padding:12px 18px;border-radius:10px;border:1.5px solid #ddd;background:white;font-weight:700;cursor:pointer;">Cancel</button>
+      <button onclick="saveStatus()" style="flex:1;padding:14px;border-radius:12px;border:none;background:var(--navy);color:white;font-weight:800;cursor:pointer;font-size:14px;">Update</button>
+      <button onclick="closeModal('statusModal')" style="padding:14px 18px;border-radius:12px;border:2px solid var(--border);background:white;font-weight:700;cursor:pointer;font-size:14px;">Cancel</button>
     </div>
   </div>
 </div>
@@ -327,16 +490,28 @@ nav{background:white;padding:12px 16px;display:flex;align-items:center;justify-c
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPA_URL='https://sveixtxuascbvoeyxqgl.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZWl4dHh1YXNjYnZvZXl4cWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxOTI3MDQsImV4cCI6MjA4Nzc2ODcwNH0.t6Bs8weRt4EMjiX0aICArsGaVS6buiakrPST4RVsfHY';
-const SB=supabase.createClient(SUPA_URL,SUPA_KEY);
+const SB=supabase.createClient('https://sveixtxuascbvoeyxqgl.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2ZWl4dHh1YXNjYnZvZXl4cWdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxOTI3MDQsImV4cCI6MjA4Nzc2ODcwNH0.t6Bs8weRt4EMjiX0aICArsGaVS6buiakrPST4RVsfHY');
 const SC={panelWatt:545,res:45000,com:40000,ind:35000,s2:30000,s3:60000,s3p:78000,upd:4.5,deg:0.005,exp:3.5,maint:0.01,co2:0.82};
 const NM={Maharashtra:"Net Metering up to 1 MW | MSEDCL | Annual",Gujarat:"Net Metering up to 1 MW | DGVCL | Monthly",Rajasthan:"Net Metering up to 1 MW | JDVVNL | Quarterly","Tamil Nadu":"Net Metering up to 1 MW | TANGEDCO | Annual",Karnataka:"Net Metering up to 1 MW | BESCOM | Annual",Delhi:"Net Metering up to 500 kW | BSES | Monthly","Uttar Pradesh":"Net Metering up to 1 MW | UPPCL | Quarterly",Telangana:"Net Metering up to 1 MW | TSSPDCL | Annual",Haryana:"Net Metering up to 500 kW | DHBVN | Monthly",Punjab:"Net Metering up to 1 MW | PSPCL | Annual",Other:"Net Metering as per MNRE/CERC guidelines."};
-let cat='residential',CU=null,CP=null,CT={color:'#1a3370',title:'',footer:'',payment:'',terms:'',wa:''},pendingRId=null,pendingRName=null,pdfBlob=null;
+let cat='residential',CU=null,CP=null,CT={color:'#1a3370',title:'',footer:'',payment:'',terms:'',wa:''},allQuotes=[],filterStatus='all',logoDataUrl=null;
+let pendingRId=null,pendingRName=null,curSlide=0;
+const totalSlides=4;
 
-function inr(n){const a=Math.abs(Math.round(n));const s=a.toString();if(s.length<=3)return(n<0?'-':'')+'₹'+s;let r=s.slice(-3),m=s.slice(0,-3);while(m.length>2){r=m.slice(-2)+','+r;m=m.slice(0,-2);}return(n<0?'-':'')+'₹'+m+','+r;}
+function inr(n){const a=Math.abs(Math.round(n||0));const s=a.toString();if(s.length<=3)return(n<0?'-':'')+'₹'+s;let r=s.slice(-3),m=s.slice(0,-3);while(m.length>2){r=m.slice(-2)+','+r;m=m.slice(0,-2);}return(n<0?'-':'')+'₹'+m+','+r;}
 function showToast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#22c55e':'#ef4444';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
+
+// ONBOARDING
+function nextSlide(){
+  curSlide++;
+  if(curSlide>=totalSlides){finishOnboard();return;}
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
+  document.getElementById('sl'+curSlide).classList.add('active');
+  document.getElementById('d'+curSlide).classList.add('active');
+  if(curSlide===totalSlides-1)document.getElementById('nextBtn').textContent='Shuru Karein! 🚀';
+}
+function finishOnboard(){localStorage.setItem('sq_onboarded','1');document.getElementById('onboard').style.display='none';}
 
 // AUTH
 let authMode='login';
@@ -344,27 +519,25 @@ function switchAuth(m){
   authMode=m;
   document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(m==='login'&&i===0)||(m==='signup'&&i===1)));
   document.getElementById('signupExtra').style.display=m==='signup'?'block':'none';
-  document.getElementById('authBtn').textContent=m==='login'?'Login':'🚀 Create Free Account';
-  document.getElementById('authSub').textContent=m==='login'?'Sign in to continue':'Create your free account';
-  document.getElementById('authMsg').className='msg';
+  document.getElementById('authBtn').textContent=m==='login'?'Login →':'🚀 Free Account Banayein';
+  document.getElementById('authSub').textContent=m==='login'?'Apne account mein login karein':'Aaj hi free mein shuru karein';
+  document.getElementById('authMsg').className='amsg';
 }
 async function doAuth(){
   const email=document.getElementById('aEmail').value.trim();
   const pass=document.getElementById('aPass').value;
   const msg=document.getElementById('authMsg');
-  if(!email||!pass){msg.className='msg err';msg.textContent='Please fill all fields';return;}
+  if(!email||!pass){msg.className='amsg err';msg.textContent='Please fill all fields';return;}
   document.getElementById('authBtn').disabled=true;document.getElementById('authBtn').textContent='Please wait...';
   if(authMode==='signup'){
     const {data,error}=await SB.auth.signUp({email,password:pass});
-    if(error){msg.className='msg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='🚀 Create Free Account';return;}
-    if(data.user){
-      await SB.from('profiles').upsert({id:data.user.id,company_name:document.getElementById('aCompany').value.trim()||'My Solar Company',phone:document.getElementById('aPhone').value.trim()||'',plan:'free',quotes_count:0});
-    }
-    msg.className='msg ok';msg.textContent='✅ Account created! Logging in...';
+    if(error){msg.className='amsg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='🚀 Free Account Banayein';return;}
+    if(data.user){await SB.from('profiles').upsert({id:data.user.id,company_name:document.getElementById('aCompany').value.trim()||'My Solar Company',phone:document.getElementById('aPhone').value.trim()||'',plan:'free',quotes_count:0});}
+    msg.className='amsg ok';msg.textContent='✅ Account created! Logging in...';
     setTimeout(()=>initApp(data.user),1200);
   } else {
     const {data,error}=await SB.auth.signInWithPassword({email,password:pass});
-    if(error){msg.className='msg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='Login';return;}
+    if(error){msg.className='amsg err';msg.textContent=error.message;document.getElementById('authBtn').disabled=false;document.getElementById('authBtn').textContent='Login →';return;}
     initApp(data.user);
   }
 }
@@ -374,7 +547,8 @@ async function initApp(user){
   CP=prof||{plan:'free'};
   document.getElementById('authScreen').style.display='none';
   document.getElementById('mainApp').style.display='block';
-  document.getElementById('navName').textContent=CP.company_name||user.email;
+  document.getElementById('navName').textContent=CP.company_name||'SolarQuote Pro';
+  document.getElementById('navSub').textContent=CP.company_name?user.email:'Setup your company';
   document.getElementById('settEmail').textContent=user.email;
   document.getElementById('sCompany').value=CP.company_name||'';
   document.getElementById('sPhone').value=CP.phone||'';
@@ -383,13 +557,16 @@ async function initApp(user){
   const plan=CP.plan||'free';
   document.getElementById('settPlan').textContent=plan.charAt(0).toUpperCase()+plan.slice(1);
   document.getElementById('settPlan').className='plan-badge plan-'+plan;
-  loadTemplate();
-  loadAdminMsgs();
-  loadDashboard();
-  checkReminders();
+  loadTemplate();loadLogoPreview();loadAdminMsgs();loadDashboard();checkReminders();
 }
-async function doLogout(){await SB.auth.signOut();document.getElementById('mainApp').style.display='none';document.getElementById('authScreen').style.display='flex';CU=null;CP=null;}
-window.onload=async()=>{const {data}=await SB.auth.getSession();if(data.session)initApp(data.session.user);};
+async function doLogout(){await SB.auth.signOut();document.getElementById('mainApp').style.display='none';document.getElementById('authScreen').style.display='flex';CU=null;CP=null;allQuotes=[];}
+window.onload=async()=>{
+  const {data}=await SB.auth.getSession();
+  if(data.session){initApp(data.session.user);}
+  else{
+    if(!localStorage.getItem('sq_onboarded'))document.getElementById('onboard').style.display='flex';
+  }
+};
 
 // NAV
 function showPage(name){
@@ -426,83 +603,99 @@ function calcD(){
 }
 function liveCalc(){
   const d=calcD();const p=document.getElementById('livePanel');
-  if(!d){p.innerHTML='<div style="text-align:center;padding:16px;color:#ccc;"><div style="font-size:32px;">☀</div><div style="font-size:12px;margin-top:6px;">Enter monthly bill</div></div>';return;}
-  const sub=d.sub>0?`<div class="subsidy-box"><span style="font-size:20px">🏛</span><div><div style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:1px">MNRE SUBSIDY!</div><div style="font-size:17px;font-weight:800;color:#16a34a">${inr(d.sub)}</div></div></div>`:'';
-  p.innerHTML=`<div class="metric-grid"><div class="metric"><div class="ml">System</div><div class="mv" style="color:#f60">${d.kWp} kWp</div><div class="ms">${d.panels} panels</div></div><div class="metric"><div class="ml">Annual Gen</div><div class="mv" style="color:#f59e0b">${d.gen.toLocaleString()}</div><div class="ms">kWh/yr</div></div><div class="metric"><div class="ml">Net Cost</div><div class="mv" style="color:#f60">${inr(d.net)}</div><div class="ms">Gross ${inr(d.gross)}</div></div><div class="metric"><div class="ml">Savings/yr</div><div class="mv" style="color:#22c55e">${inr(d.netSav)}</div><div class="ms">${d.pb}yr payback</div></div></div>${sub}<div class="roi-bar"><div style="display:flex;justify-content:space-between;font-size:10px;color:#bbb"><span>25-Year ROI</span><span style="font-weight:800;color:#f59e0b">${d.roi}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,d.roi/5)}%"></div></div></div><div style="text-align:center;font-size:10px;color:#bbb;margin-top:4px;">🌱 ${d.co2}t CO₂/yr = ${Math.round(d.co2*45)} trees</div>`;
+  if(!d){p.innerHTML='<div class="empty-state" style="padding:20px 0;"><div class="empty-icon" style="font-size:40px;">☀️</div><div style="font-size:13px;color:var(--sub);">Monthly bill enter karein</div></div>';return;}
+  const sub=d.sub>0?`<div class="subsidy-box"><span style="font-size:24px">🏛</span><div><div style="font-size:9px;font-weight:800;color:#16a34a;letter-spacing:1px;text-transform:uppercase;">MNRE Subsidy!</div><div style="font-size:20px;font-weight:900;color:#16a34a;">${inr(d.sub)}</div><div style="font-size:10px;color:#86efac;">PM-Surya Ghar Yojana</div></div></div>`:'';
+  p.innerHTML=`<div class="metric-grid">
+    <div class="metric"><div class="ml">System</div><div class="mv" style="color:var(--orange)">${d.kWp} kWp</div><div class="ms">${d.panels} panels</div></div>
+    <div class="metric"><div class="ml">Annual Gen</div><div class="mv" style="color:var(--yellow)">${d.gen.toLocaleString()}</div><div class="ms">kWh/year</div></div>
+    <div class="metric"><div class="ml">Net Cost</div><div class="mv" style="color:var(--orange)">${inr(d.net)}</div><div class="ms">Gross ${inr(d.gross)}</div></div>
+    <div class="metric"><div class="ml">Savings/yr</div><div class="mv" style="color:var(--green)">${inr(d.netSav)}</div><div class="ms">${d.pb}yr payback</div></div>
+  </div>${sub}
+  <div class="roi-bar"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);font-weight:700;"><span>25-Year ROI</span><span style="color:var(--yellow);font-size:13px;">${d.roi}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,d.roi/5)}%"></div></div></div>
+  <div style="text-align:center;font-size:11px;color:var(--sub);margin-top:6px;">🌱 ${d.co2}t CO₂/yr = ${Math.round(d.co2*45)} trees planted</div>`;
 }
 
 // DASHBOARD
 async function loadDashboard(){
   if(!CU)return;
   const {data:qs}=await SB.from('quotes').select('*').eq('user_id',CU.id).order('created_at',{ascending:false});
-  const quotes=qs||[];
+  allQuotes=qs||[];
   const now=new Date();
-  document.getElementById('stTotal').textContent=quotes.length;
-  document.getElementById('stMonth').textContent=quotes.filter(q=>new Date(q.created_at).getMonth()===now.getMonth()&&new Date(q.created_at).getFullYear()===now.getFullYear()).length;
-  document.getElementById('stValue').textContent=inr(quotes.reduce((a,q)=>a+(q.net_cost||0),0));
+  document.getElementById('stTotal').textContent=allQuotes.length;
+  document.getElementById('stMonth').textContent=allQuotes.filter(q=>new Date(q.created_at).getMonth()===now.getMonth()&&new Date(q.created_at).getFullYear()===now.getFullYear()).length;
+  document.getElementById('stValue').textContent=inr(allQuotes.reduce((a,q)=>a+(q.net_cost||0),0));
   const plan=CP?.plan||'free';
   document.getElementById('stPlan').innerHTML=`<span class="plan-badge plan-${plan}">${plan.charAt(0).toUpperCase()+plan.slice(1)}</span>`;
-  if(!quotes.length){document.getElementById('quoteList').innerHTML='<div style="text-align:center;padding:40px 20px;color:#ccc;"><div style="font-size:40px;">☀</div><div style="font-weight:700;font-size:15px;color:#bbb;margin:10px 0 4px;">No quotes yet</div><div style="font-size:12px;margin-bottom:16px;">Create your first solar quotation</div><button onclick="showPage(\'quote\')" style="padding:10px 24px;border-radius:9px;background:#ff6b00;color:white;border:none;font-weight:700;cursor:pointer;font-size:13px;">+ Create Quote</button></div>';return;}
+  renderFilteredQuotes();
+}
+
+function setFilter(status,el){
+  filterStatus=status;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderFilteredQuotes();
+}
+
+function filterQuotes(){renderFilteredQuotes();}
+
+function renderFilteredQuotes(){
+  const search=document.getElementById('dashSearch').value.toLowerCase();
+  let filtered=allQuotes;
+  if(filterStatus!=='all')filtered=filtered.filter(q=>(q.status||'sent')===filterStatus);
+  if(search)filtered=filtered.filter(q=>(q.customer_name||'').toLowerCase().includes(search)||(q.customer_state||'').toLowerCase().includes(search)||(q.quote_number||'').toLowerCase().includes(search));
+  if(!filtered.length){
+    document.getElementById('quoteList').innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div style="font-weight:700;font-size:15px;color:#94a3b8;margin-bottom:8px;">${search||filterStatus!=='all'?'Koi quote nahi mila':'Abhi tak koi quote nahi'}</div><button onclick="showPage('quote')" style="padding:12px 28px;border-radius:12px;background:var(--orange);color:white;border:none;font-weight:800;cursor:pointer;font-size:14px;">+ New Quote</button></div>`;
+    return;
+  }
   const sl={sent:'📤 Sent',followup:'🔔 Follow-up',closed:'✅ Closed',lost:'❌ Lost'};
-  document.getElementById('quoteList').innerHTML=quotes.map(q=>`
+  document.getElementById('quoteList').innerHTML=filtered.map(q=>`
     <div class="quote-item">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-        <div style="font-weight:700;font-size:14px;flex:1;">${q.customer_name}</div>
+        <div style="font-weight:800;font-size:15px;flex:1;">${q.customer_name}</div>
         <span class="status-badge s-${q.status||'sent'}">${sl[q.status||'sent']}</span>
-        <span style="font-size:14px;font-weight:800;color:#ff6b00;">${q.system_kwp} kWp</span>
+        <span style="font-size:15px;font-weight:900;color:var(--orange);">${q.system_kwp} kWp</span>
       </div>
-      <div style="font-size:11px;color:#aaa;margin-top:3px;">${q.quote_number||'—'} • ${q.customer_state} • ${new Date(q.created_at).toLocaleDateString('en-IN')}</div>
-      <div style="display:flex;gap:14px;margin-top:6px;">
-        <div><div style="font-size:13px;font-weight:700;">${inr(q.net_cost)}</div><div style="font-size:10px;color:#aaa;">Net Cost</div></div>
-        <div><div style="font-size:13px;font-weight:700;color:#22c55e;">${inr(q.annual_savings)}/yr</div><div style="font-size:10px;color:#aaa;">Savings</div></div>
-        <div><div style="font-size:12px;font-weight:700;color:#f59e0b;">${q.payback_years} yrs</div><div style="font-size:10px;color:#aaa;">Payback</div></div>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px;font-weight:600;">${q.quote_number||'—'} • ${q.customer_state} • ${new Date(q.created_at).toLocaleDateString('en-IN')}</div>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <div><div style="font-size:14px;font-weight:800;">${inr(q.net_cost)}</div><div style="font-size:10px;color:var(--sub);font-weight:600;">Net Cost</div></div>
+        <div><div style="font-size:14px;font-weight:800;color:var(--green);">${inr(q.annual_savings)}/yr</div><div style="font-size:10px;color:var(--sub);font-weight:600;">Savings</div></div>
+        <div><div style="font-size:13px;font-weight:800;color:var(--yellow);">${q.payback_years} yrs</div><div style="font-size:10px;color:var(--sub);font-weight:600;">Payback</div></div>
       </div>
       <div class="qi-btns">
         <button class="qi-btn wa" onclick="waDash('${q.customer_name}',${q.system_kwp},${q.net_cost},${q.annual_savings},${q.payback_years},${q.subsidy||0})">📱 WA</button>
-        <button class="qi-btn reminder" onclick="openReminder('${q.id}','${q.customer_name.replace(/'/g,'&#39;')}')">🔔 Remind</button>
-        <button class="qi-btn status" onclick="openStatus('${q.id}','${q.status||'sent'}')">📊 Status</button>
+        <button class="qi-btn rem" onclick="openReminder('${q.id}','${q.customer_name.replace(/'/g,'&#39;')}')">🔔 Remind</button>
+        <button class="qi-btn st" onclick="openStatus('${q.id}','${q.status||'sent'}')">📊 Status</button>
         <button class="qi-btn del" onclick="delQuote('${q.id}')">🗑</button>
       </div>
     </div>`).join('');
 }
+
 async function delQuote(id){if(!confirm('Delete this quote?'))return;await SB.from('quotes').delete().eq('id',id);showToast('Deleted!');loadDashboard();}
 function waDash(name,kwp,net,sav,pb,sub){
   const co=CP?.company_name||'SolarQuote Pro';
-  let msg=CT.wa||`Hi ${name},%0A%0AYour Solar Quotation is ready!%0A%0A☀ System: *${kwp} kWp*%0A💰 Investment: *${inr(net)}*%0A🏛 MNRE Subsidy: *${inr(sub)}*%0A📊 Annual Savings: *${inr(sav)}*%0A⏱ Payback: *${pb} Years*%0A%0AFrom: ${co}`;
+  let msg=CT.wa||`Hi ${name},%0A%0AYour Solar Quote ready hai!%0A%0A☀ System: *${kwp} kWp*%0A💰 Investment: *${inr(net)}*%0A🏛 MNRE Subsidy: *${inr(sub)}*%0A📊 Annual Savings: *${inr(sav)}*%0A⏱ Payback: *${pb} Years*%0A%0AFrom: ${co}`;
   msg=msg.replace(/{name}/g,name).replace(/{kwp}/g,kwp).replace(/{net}/g,inr(net)).replace(/{sav}/g,inr(sav)).replace(/{pb}/g,pb).replace(/{company}/g,co);
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 
 // REMINDERS
-function openReminder(id,name){
-  pendingRId=id;pendingRName=name;
-  document.getElementById('rName').value=name;
-  const d=new Date();d.setDate(d.getDate()+3);
-  document.getElementById('rDate').value=d.toISOString().split('T')[0];
-  document.getElementById('rNote').value='Follow-up call regarding solar quotation';
-  document.getElementById('reminderModal').classList.add('show');
-}
-function saveReminder(){
-  const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');
-  rs.push({id:Date.now().toString(),qId:pendingRId,name:pendingRName,date:document.getElementById('rDate').value,note:document.getElementById('rNote').value,done:false});
-  localStorage.setItem('sq_rem_'+CU?.id,JSON.stringify(rs));
-  closeModal('reminderModal');showToast('✅ Reminder set!');checkReminders();
-}
+function openReminder(id,name){pendingRId=id;pendingRName=name;document.getElementById('rName').value=name;const d=new Date();d.setDate(d.getDate()+3);document.getElementById('rDate').value=d.toISOString().split('T')[0];document.getElementById('rNote').value='Follow-up call regarding solar quotation';document.getElementById('reminderModal').classList.add('show');}
+function saveReminder(){const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');rs.push({id:Date.now().toString(),qId:pendingRId,name:pendingRName,date:document.getElementById('rDate').value,note:document.getElementById('rNote').value,done:false});localStorage.setItem('sq_rem_'+CU?.id,JSON.stringify(rs));closeModal('reminderModal');showToast('✅ Reminder set!');checkReminders();}
 function loadReminders(){
   const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');
   const today=new Date().toISOString().split('T')[0];
-  if(!rs.length){document.getElementById('reminderList').innerHTML='<div style="text-align:center;padding:30px;color:#ccc;"><div style="font-size:36px;">🔔</div><div style="font-size:13px;margin-top:8px;">No reminders set</div><div style="font-size:11px;color:#ddd;margin-top:4px;">Go to Dashboard → Quote → 🔔 Remind</div></div>';return;}
+  if(!rs.length){document.getElementById('reminderList').innerHTML='<div class="empty-state"><div class="empty-icon">🔔</div><div style="font-size:14px;color:#94a3b8;font-weight:700;">Koi reminder nahi</div><div style="font-size:12px;color:#cbd5e1;margin-top:6px;">Dashboard → Quote → 🔔 Remind</div></div>';return;}
   document.getElementById('reminderList').innerHTML=rs.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`
-    <div class="reminder-item" style="${r.done?'opacity:0.5;':''}${r.date<=today&&!r.done?'background:#fff0f0;border-color:#fecaca;':''}">
+    <div class="rem-item ${r.date<=today&&!r.done?'due':''}" style="${r.done?'opacity:0.5;':''}">
       <div style="flex:1;">
-        <div style="font-weight:700;font-size:13px;">${r.name}</div>
-        <div style="font-size:11px;color:#888;margin-top:2px;">📅 ${new Date(r.date).toLocaleDateString('en-IN')}</div>
-        <div style="font-size:11px;color:#aaa;margin-top:2px;">${r.note}</div>
-        ${r.date<=today&&!r.done?'<div style="font-size:11px;color:#ef4444;font-weight:700;margin-top:3px;">⚠️ Due today!</div>':''}
+        <div style="font-weight:800;font-size:14px;">${r.name}</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:3px;font-weight:600;">📅 ${new Date(r.date).toLocaleDateString('en-IN')}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px;">${r.note}</div>
+        ${r.date<=today&&!r.done?'<div style="font-size:12px;color:var(--red);font-weight:800;margin-top:4px;">⚠️ Due today!</div>':''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:5px;">
-        ${!r.done?`<button onclick="doneRem('${r.id}')" style="padding:5px 8px;border-radius:7px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-size:11px;font-weight:700;cursor:pointer;">✅</button>`:'<span style="font-size:11px;color:#16a34a;font-weight:700;">✅</span>'}
-        <button onclick="delRem('${r.id}')" style="padding:5px 8px;border-radius:7px;background:#fff0f0;color:#ef4444;border:1px solid #fecaca;font-size:11px;font-weight:700;cursor:pointer;">🗑</button>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${!r.done?`<button onclick="doneRem('${r.id}')" style="padding:8px 10px;border-radius:10px;background:#f0fdf4;color:#16a34a;border:2px solid #bbf7d0;font-size:12px;font-weight:800;cursor:pointer;">✅</button>`:'<span style="font-size:12px;color:#16a34a;font-weight:800;">✅</span>'}
+        <button onclick="delRem('${r.id}')" style="padding:8px 10px;border-radius:10px;background:#fff0f0;color:var(--red);border:2px solid #fecaca;font-size:12px;font-weight:800;cursor:pointer;">🗑</button>
       </div>
     </div>`).join('');
 }
@@ -511,17 +704,32 @@ function delRem(id){const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||
 function checkReminders(){const rs=JSON.parse(localStorage.getItem('sq_rem_'+CU?.id)||'[]');const t=new Date().toISOString().split('T')[0];const due=rs.filter(r=>!r.done&&r.date<=t).length;document.getElementById('reminderDot').style.display=due>0?'inline-block':'none';}
 
 // STATUS
-function openStatus(id,status){document.getElementById('statusQId').value=id;document.getElementById('statusSel').value=status;document.getElementById('statusModal').classList.add('show');}
+function openStatus(id,s){document.getElementById('statusQId').value=id;document.getElementById('statusSel').value=s;document.getElementById('statusModal').classList.add('show');}
 async function saveStatus(){const id=document.getElementById('statusQId').value;const status=document.getElementById('statusSel').value;await SB.from('quotes').update({status}).eq('id',id);closeModal('statusModal');showToast('✅ Status updated!');loadDashboard();}
 
 // ADMIN MESSAGES
 async function loadAdminMsgs(){
-  try{
-    const {data:msgs}=await SB.from('admin_messages').select('*').eq('user_id',CU.id).order('created_at',{ascending:false}).limit(3);
-    if(!msgs||!msgs.length){document.getElementById('adminMsgArea').innerHTML='';return;}
-    document.getElementById('adminMsgArea').innerHTML=`<div class="admin-msg-card"><div style="font-size:10px;font-weight:800;color:#1a3370;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">📢 Message from Admin</div>${msgs.map(m=>`<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:13px;">${m.subject||'Update'}</div><div style="font-size:12px;color:#555;margin-top:3px;">${m.body}</div><div style="font-size:10px;color:#aaa;margin-top:3px;">${new Date(m.created_at).toLocaleDateString('en-IN')}</div></div>`).join('')}</div>`;
-  }catch(e){document.getElementById('adminMsgArea').innerHTML='';}
+  try{const {data}=await SB.from('admin_messages').select('*').eq('user_id',CU.id).order('created_at',{ascending:false}).limit(3);
+  if(!data||!data.length){document.getElementById('adminMsgArea').innerHTML='';return;}
+  document.getElementById('adminMsgArea').innerHTML=`<div class="admin-msg-card"><div style="font-size:10px;font-weight:800;color:var(--navy);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">📢 Admin Message</div>${data.map(m=>`<div style="margin-bottom:10px;"><div style="font-weight:800;font-size:14px;">${m.subject||'Update'}</div><div style="font-size:13px;color:var(--sub);margin-top:4px;line-height:1.6;">${m.body}</div><div style="font-size:10px;color:#cbd5e1;margin-top:4px;font-weight:600;">${new Date(m.created_at).toLocaleDateString('en-IN')}</div></div>`).join('')}</div>`;}
+  catch(e){document.getElementById('adminMsgArea').innerHTML='';}
 }
+
+// LOGO
+function handleLogo(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>512000){showToast('Max 500KB allowed!',false);return;}
+  const reader=new FileReader();
+  reader.onload=e=>{logoDataUrl=e.target.result;const img=document.getElementById('logoPreview');img.src=logoDataUrl;img.style.display='block';};
+  reader.readAsDataURL(file);
+}
+function saveLogo(){
+  if(!logoDataUrl){showToast('Pehle logo select karein!',false);return;}
+  localStorage.setItem('sq_logo_'+CU?.id,logoDataUrl);
+  showToast('✅ Logo saved!');
+}
+function clearLogo(){logoDataUrl=null;localStorage.removeItem('sq_logo_'+CU?.id);document.getElementById('logoPreview').style.display='none';showToast('Logo removed!');}
+function loadLogoPreview(){const l=localStorage.getItem('sq_logo_'+CU?.id);if(l){logoDataUrl=l;const img=document.getElementById('logoPreview');img.src=l;img.style.display='block';}}
 
 // TEMPLATE
 function setClr(c,el){CT.color=c;document.querySelectorAll('.clr-swatch').forEach(s=>s.classList.remove('selected'));el.classList.add('selected');localStorage.setItem('sq_tpl_'+CU?.id,JSON.stringify(CT));}
@@ -531,12 +739,13 @@ function saveTemplate(){CT.title=document.getElementById('tTitle').value;CT.foot
 // SETTINGS
 async function saveSettings(){
   const p={id:CU.id,company_name:document.getElementById('sCompany').value.trim(),phone:document.getElementById('sPhone').value.trim(),gst:document.getElementById('sGst').value.trim(),website:document.getElementById('sWeb').value.trim()};
-  const {error}=await SB.from('profiles').upsert(p);
-  if(error){showToast('Error saving!',false);return;}
-  CP={...CP,...p};document.getElementById('navName').textContent=p.company_name||CU.email;showToast('✅ Saved!');
+  await SB.from('profiles').upsert(p);CP={...CP,...p};
+  document.getElementById('navName').textContent=p.company_name||'SolarQuote Pro';
+  document.getElementById('navSub').textContent=p.company_name?CU.email:'Setup your company';
+  showToast('✅ Saved!');
 }
 
-// GENERATE — PDF fix: single download only
+// GENERATE
 function validate(){
   let ok=true;
   [['cName','f-cn'],['cPhone','f-cp'],['cAddr','f-ca'],['cState','f-cs'],['fBill','f-bill']].forEach(([id,fid])=>{
@@ -545,54 +754,35 @@ function validate(){
   });
   return ok;
 }
-
 async function generateQuote(){
-  if(!validate()){showToast('⚠ Fill all required fields!',false);return;}
-  const d=calcD();if(!d){showToast('Enter monthly bill!',false);return;}
+  if(!validate()){showToast('⚠ Required fields fill karein!',false);return;}
+  const d=calcD();if(!d){showToast('Monthly bill enter karein!',false);return;}
   const btn=document.getElementById('genBtn');
-  if(btn.disabled)return; // prevent double click
-  btn.disabled=true;btn.textContent='⏳ Generating PDF...';
+  if(btn.disabled)return;
+  btn.disabled=true;btn.textContent='⏳ PDF bana raha hai...';
   try{
     const now=new Date();
     const qno='SQ-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0')+String(now.getSeconds()).padStart(2,'0');
-    // Build PDF as blob and use single download
     await buildAndDownloadPDF(d,qno);
-    // Save to Supabase
-    await SB.from('quotes').insert({
-      user_id:CU.id,quote_number:qno,
-      customer_name:document.getElementById('cName').value,
-      customer_phone:document.getElementById('cPhone').value,
-      customer_address:document.getElementById('cAddr').value,
-      customer_state:document.getElementById('cState').value,
-      discom:document.getElementById('cDiscom').value,
-      system_kwp:d.kWp,gross_cost:d.gross,subsidy:d.sub,
-      net_cost:d.net,annual_savings:d.netSav,
-      payback_years:d.pb,roi_25yr:d.roi,category:d.cat,status:'sent'
-    });
-    showToast('✅ PDF Downloaded & Saved to Cloud!');
+    await SB.from('quotes').insert({user_id:CU.id,quote_number:qno,customer_name:document.getElementById('cName').value,customer_phone:document.getElementById('cPhone').value,customer_address:document.getElementById('cAddr').value,customer_state:document.getElementById('cState').value,discom:document.getElementById('cDiscom').value,system_kwp:d.kWp,gross_cost:d.gross,subsidy:d.sub,net_cost:d.net,annual_savings:d.netSav,payback_years:d.pb,roi_25yr:d.roi,category:d.cat,status:'sent'});
+    showToast('✅ PDF Downloaded & Cloud mein Save!');
   }catch(e){console.error(e);showToast('Error: '+e.message,false);}
   btn.disabled=false;btn.textContent='☀ Generate & Download PDF';
 }
-
 function sendWA(){
   const d=calcD();const name=document.getElementById('cName').value;
-  if(!d||!name){showToast('Fill form first!',false);return;}
+  if(!d||!name){showToast('Form fill karein!',false);return;}
   const co=CP?.company_name||'SolarQuote Pro';
-  let msg=CT.wa||`Hi ${name},%0A%0AYour Solar Quote:%0A☀ *${d.kWp} kWp* System%0A💰 Investment: *${inr(d.net)}*%0A🏛 Subsidy: *${inr(d.sub)}*%0A📊 Savings: *${inr(d.netSav)}/yr*%0A⏱ Payback: *${d.pb} Yrs*%0A📈 ROI: *${d.roi}%25*%0A%0AFrom: ${co}`;
+  let msg=CT.wa||`Hi ${name},%0A%0AYour Solar Quote ready hai!%0A☀ *${d.kWp} kWp* System%0A💰 Investment: *${inr(d.net)}*%0A🏛 Subsidy: *${inr(d.sub)}*%0A📊 Savings: *${inr(d.netSav)}/yr*%0A⏱ Payback: *${d.pb} Yrs*%0A📈 ROI: *${d.roi}%25*%0A%0AFrom: ${co}`;
   msg=msg.replace(/{name}/g,name).replace(/{kwp}/g,d.kWp).replace(/{net}/g,inr(d.net)).replace(/{sav}/g,inr(d.netSav)).replace(/{pb}/g,d.pb).replace(/{company}/g,co);
   const ph=document.getElementById('cPhone').value.replace(/\D/g,'');
   window.open('https://wa.me/'+(ph.startsWith('91')?ph:'91'+ph)+'?text='+encodeURIComponent(msg),'_blank');
 }
 
-// PDF — single download, no repeat
+// PDF WITH LOGO
 async function buildAndDownloadPDF(d,qno){
-  // Load jsPDF dynamically only once
   if(!window.jspdf){
-    await new Promise((res,rej)=>{
-      const s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-      s.onload=res;s.onerror=rej;document.head.appendChild(s);
-    });
+    await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
   }
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
@@ -607,6 +797,7 @@ async function buildAndDownloadPDF(d,qno){
   const co=CP?.company_name||'SolarQuote Pro';
   const iph=CP?.phone||'';
   const gst=CP?.gst||'';
+  const web=CP?.website||'';
   const panel=document.getElementById('fPanel').value;
   const inv=document.getElementById('fInverter').value;
   const phase=document.getElementById('fPhase').value;
@@ -614,48 +805,77 @@ async function buildAndDownloadPDF(d,qno){
   const hx=CT.color||'#1a3370';
   const hc=[parseInt(hx.slice(1,3),16),parseInt(hx.slice(3,5),16),parseInt(hx.slice(5,7),16)];
   const title=CT.title||'Professional Solar Quotation | India 2025';
-  const footer=CT.footer||co+' | SolarQuote Pro India';
+  const footer=CT.footer||co;
   const payment=CT.payment||'30% Advance | 60% Before Installation | 10% After Commissioning';
   const terms=CT.terms||'Generation may vary ±10%. Subsidy subject to Govt. policy. Net metering subject to DISCOM approval. Quote valid 30 days.';
+  const logoSaved=localStorage.getItem('sq_logo_'+CU?.id)||null;
   const W=210,M=12;let y=0;
   const R=(x,fy,w,h,r,g,b)=>{doc.setFillColor(r,g,b);doc.rect(x,fy,w,h,'F');};
   const T=(t,x,fy,o={})=>{doc.setFont('helvetica',o.b?'bold':'normal');doc.setFontSize(o.s||9);doc.setTextColor(...(o.c||[30,30,30]));doc.text(String(t),x,fy,{align:o.a||'left'});};
   const L=(x1,y1,x2,y2,r=200,g=200,b=200,lw=0.2)=>{doc.setDrawColor(r,g,b);doc.setLineWidth(lw);doc.line(x1,y1,x2,y2);};
-  R(0,0,W,28,...hc);doc.setFillColor(255,107,0);doc.circle(M+5,14,5,'F');doc.setFillColor(255,200,80);doc.circle(M+5,14,2.5,'F');
-  T('SolarQuote Pro',M+13,11,{b:true,s:16,c:[255,255,255]});T(title,M+13,18,{s:7.5,c:[200,220,255]});
-  T('Quote: '+qno,W-M,10,{s:8,c:[200,220,255],a:'right'});T('Date: '+ds,W-M,16,{s:8,c:[200,220,255],a:'right'});T('Valid Till: '+vt,W-M,22,{s:8,c:[200,220,255],a:'right'});y=32;
-  R(M,y,W-2*M,8,255,107,0);T('Prepared by: '+co+(iph?' | '+iph:'')+(gst?' | GST: '+gst:''),M+3,y+5.5,{b:true,s:7.5,c:[255,255,255]});y+=11;
+  // HEADER
+  R(0,0,W,32,...hc);
+  // Logo if available
+  if(logoSaved){
+    try{doc.addImage(logoSaved,'PNG',M,4,24,24);}catch(e){}
+    T(co,M+28,13,{b:true,s:15,c:[255,255,255]});T(title,M+28,20,{s:7.5,c:[200,220,255]});
+  } else {
+    doc.setFillColor(255,107,0);doc.circle(M+6,16,6,'F');doc.setFillColor(255,220,100);doc.circle(M+6,16,3,'F');
+    T(co,M+16,13,{b:true,s:15,c:[255,255,255]});T(title,M+16,20,{s:7.5,c:[200,220,255]});
+  }
+  T('Quote: '+qno,W-M,8,{s:7.5,c:[200,220,255],a:'right'});
+  T('Date: '+ds,W-M,14,{s:7.5,c:[200,220,255],a:'right'});
+  T('Valid Till: '+vt,W-M,20,{s:7.5,c:[200,220,255],a:'right'});
+  T('Prepared by: '+co+(iph?' | '+iph:'')+(gst?' | GST: '+gst:'')+(web?' | '+web:''),M,28,{s:7,c:[180,210,255]});
+  y=35;
+  // CUSTOMER
   R(M,y,W-2*M,7,...hc);T('CUSTOMER DETAILS',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
   [[name,phone,'Customer Name','Phone'],[addr,state,'Address','State'],[discom,d.cat.charAt(0).toUpperCase()+d.cat.slice(1),'DISCOM','Category']].forEach(([v1,v2,l1,l2],i)=>{
     R(M,y,W-2*M,8,i%2===0?245:255,i%2===0?246:255,i%2===0?248:255);L(M,y+8,W-M,y+8);
-    T(l1+':',M+3,y+5.5,{s:8,c:[130,130,130]});T(v1,M+38,y+5.5,{b:true,s:8.5});T(l2+':',M+108,y+5.5,{s:8,c:[130,130,130]});T(v2,M+138,y+5.5,{b:true,s:8.5});y+=8;
+    T(l1+':',M+3,y+5.5,{s:8,c:[130,130,130]});T(v1,M+40,y+5.5,{b:true,s:8.5});T(l2+':',M+108,y+5.5,{s:8,c:[130,130,130]});T(v2,M+140,y+5.5,{b:true,s:8.5});y+=8;
   });y+=5;
+  // SYSTEM
   R(M,y,W-2*M,7,...hc);T('SYSTEM SPECIFICATION',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,15,232,241,255);T('Capacity:',M+3,y+7,{s:8,c:[100,100,130]});T(d.kWp+' kWp',M+32,y+12,{b:true,s:22,c:[255,107,0]});T(d.panels+' Panels × '+SC.panelWatt+'Wp | '+panel,M+85,y+7,{s:8.5});T('Annual Generation: '+d.gen.toLocaleString()+' kWh/year',M+85,y+13,{b:true,s:9,c:hc});y+=17;
-  [[panel,'25-Year Warranty','Panel Type','Panel Warranty'],[inv,'10-Year Warranty','Inverter','Inverter Warranty'],['GI Hot-Dip Galvanized','10-Year Warranty','Structure','Warranty'],[phase==='three'?'Three Phase':'Single Phase','5-Year Workmanship','Phase','Installation'],['80% output at Year 25','Bi-directional Meter','Performance Guarantee','Net Metering']].forEach(([v1,v2,l1,l2],i)=>{
+  R(M,y,W-2*M,16,232,241,255);T('Capacity:',M+3,y+7,{s:8,c:[100,100,130]});T(d.kWp+' kWp',M+32,y+13,{b:true,s:24,c:[255,107,0]});T(d.panels+' Panels × '+SC.panelWatt+'Wp',M+85,y+7,{b:true,s:9.5});T(panel,M+85,y+13,{s:8.5});T('Annual: '+d.gen.toLocaleString()+' kWh/yr',M+85,y+19,{b:true,s:8.5,c:hc});y+=18;
+  [[panel,'25yr Warranty','Panel','Warranty'],[inv,'10yr Warranty','Inverter','Warranty'],['GI Galvanized','10yr','Structure','Warranty'],[phase==='three'?'Three Phase':'Single Phase','5yr Workmanship','Phase','Installation'],['80% at Year 25','Bi-dir Meter','Performance','Net Metering']].forEach(([v1,v2,l1,l2],i)=>{
     R(M,y,W-2*M,7.5,i%2===0?245:255,i%2===0?246:255,i%2===0?248:255);L(M,y+7.5,W-M,y+7.5);
     T(l1,M+3,y+5,{s:8,c:[120,120,120]});T(v1,M+48,y+5,{s:8.5});T(l2,M+108,y+5,{s:8,c:[120,120,120]});T(v2,M+148,y+5,{s:8.5});y+=7.5;
   });y+=5;
+  // COST
   R(M,y,W-2*M,7,255,107,0);T('COST BREAKDOWN',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,8,245,246,248);T('Gross System Cost (Supply + Installation + Commissioning)',M+3,y+5.5,{s:8.5});T(inr(d.gross),W-M-3,y+5.5,{b:true,s:8.5,a:'right'});y+=8;
-  if(d.sub>0){R(M,y,W-2*M,8,220,250,230);T('(-) MNRE PM-Surya Ghar Yojana Subsidy',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.sub),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
+  R(M,y,W-2*M,8,245,246,248);T('Gross Cost (Supply+Install+Commission)',M+3,y+5.5,{s:8.5});T(inr(d.gross),W-M-3,y+5.5,{b:true,s:8.5,a:'right'});y+=8;
+  if(d.sub>0){R(M,y,W-2*M,8,220,250,230);T('(-) MNRE PM-Surya Ghar Subsidy',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.sub),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
   if(d.disc>0){R(M,y,W-2*M,8,220,250,230);T('(-) Special Discount',M+3,y+5.5,{s:8.5,c:[27,153,71]});T('- '+inr(d.disc),W-M-3,y+5.5,{b:true,s:8.5,c:[27,153,71],a:'right'});y+=8;}
-  L(M,y,W-M,y,...hc,1);R(M,y,W-2*M,13,255,243,220);T('NET PAYABLE AMOUNT (incl. 12% GST)',M+3,y+9,{b:true,s:10.5});T(inr(d.net),W-M-3,y+9,{b:true,s:14,c:[255,107,0],a:'right'});y+=17;y+=4;
-  R(M,y,W-2*M,7,27,110,65);T('FINANCIAL ANALYSIS & ROI (25 Years)',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  [['Electricity Tariff',inr(d.tariff)+'/kWh','Annual CO₂ Avoided',d.co2+' tonnes'],['Self-Consumption',d.self.toLocaleString()+' kWh (70%)','Trees Equivalent',Math.round(d.co2*45)+' trees/yr'],['Grid Export',d.expU.toLocaleString()+' kWh','Annual Savings',inr(d.sav)],['Annual Maintenance',inr(d.maint),'Net Annual Savings',inr(d.netSav)],['Payback Period',d.pb+' Years','25-Year Savings',inr(d.life)],['25-Year ROI',d.roi+'%','Net Investment',inr(d.net)]].forEach(([l1,v1,l2,v2],i)=>{
+  L(M,y,W-M,y,...hc,1.2);R(M,y,W-2*M,13,255,243,220);T('NET PAYABLE (incl. GST)',M+3,y+9,{b:true,s:11});T(inr(d.net),W-M-3,y+9,{b:true,s:15,c:[255,107,0],a:'right'});y+=17;y+=4;
+  // FINANCIAL
+  R(M,y,W-2*M,7,27,110,65);T('FINANCIAL ANALYSIS — 25 YEARS',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
+  [['Electricity Tariff',inr(d.tariff)+'/kWh','CO₂ Saved',d.co2+' t/yr'],['Self-Consumption',d.self.toLocaleString()+' kWh','Trees Equiv.',Math.round(d.co2*45)+'/yr'],['Grid Export',d.expU.toLocaleString()+' kWh','Annual Savings',inr(d.sav)],['Maintenance',inr(d.maint),'Net Savings/yr',inr(d.netSav)],['Payback Period',d.pb+' Years','25yr Savings',inr(d.life)],['25yr ROI',d.roi+'%','Net Investment',inr(d.net)]].forEach(([l1,v1,l2,v2],i)=>{
     const last=i===5;R(M,y,W-2*M,8,last?220:i%2===0?245:255,last?250:i%2===0?246:255,last?230:i%2===0?248:255);L(M,y+8,W-M,y+8);
     T(l1,M+3,y+5.5,{s:8,c:[120,120,120]});T(v1,M+50,y+5.5,{b:last,s:last?9:8.5,c:last?[27,153,71]:[30,30,30]});
     T(l2,M+108,y+5.5,{s:8,c:[120,120,120]});T(v2,W-M-3,y+5.5,{b:last,s:last?9:8.5,c:last?[27,153,71]:[30,30,30],a:'right'});y+=8;
   });y+=5;
-  R(M,y,W-2*M,7,...hc);T('NET METERING & SUBSIDY INFO',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,22,232,241,255);T(state+' | '+nm,M+3,y+5,{b:true,s:7.5,c:hc});T('MNRE Subsidy: Up to 2kW=₹30,000 | 2-3kW=₹60,000 | >3kW=₹78,000 (Residential only)',M+3,y+11,{s:7.5});T('Subsidy credited via DBT after DISCOM inspection & commissioning',M+3,y+17,{s:7.5});T('Net Metering: Excess power exported to grid. Bi-directional meter installed by DISCOM.',M+3,y+21,{s:7});y+=25;
-  R(M,y,W-2*M,7,255,107,0);T('PAYMENT TERMS',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
-  R(M,y,W-2*M,16,255,243,220);const plines=doc.splitTextToSize(payment,W-2*M-10);doc.text(plines,M+3,y+6);y+=Math.max(16,plines.length*5+4);
-  L(M,y+12,M+65,y+12);L(W-M-65,y+12,W-M,y+12);T('Authorized Signatory & Seal',M,y+16,{s:8,c:[130,130,130]});T(co,M,y+21,{b:true,s:8.5});T('Customer Signature & Date',W-M,y+16,{s:8,c:[130,130,130],a:'right'});T(name,W-M,y+21,{b:true,s:8.5,a:'right'});y+=27;
-  doc.setFontSize(7);doc.setTextColor(160,160,160);const tlines=doc.splitTextToSize('Terms: '+terms,W-2*M);doc.text(tlines,M,y);y+=tlines.length*3.5+4;L(M,y,W-M,y);T(footer+' | '+qno,W/2,y+5,{s:7,c:[180,180,180],a:'center'});
-  // Single download — save directly
+  // NET METERING
+  R(M,y,W-2*M,7,...hc);T('NET METERING & SUBSIDY',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
+  R(M,y,W-2*M,20,232,241,255);T(state+' | '+nm,M+3,y+5,{b:true,s:7.5,c:hc});T('MNRE Subsidy: Up to 2kW=₹30k | 2-3kW=₹60k | >3kW=₹78k (Residential)',M+3,y+11,{s:7.5});T('Subsidy via DBT. Net Metering: Bi-directional meter by DISCOM.',M+3,y+17,{s:7.5});y+=23;
+  // PAYMENT
+  R(M,y,W-2*M,7,255,107,0);T('PAYMENT TERMS & SCOPE',M+3,y+5,{b:true,s:8,c:[255,255,255]});y+=7;
+  R(M,y,W-2*M,14,255,243,220);const plines=doc.splitTextToSize(payment,W-2*M-10);doc.text(plines,M+3,y+5.5);y+=Math.max(14,plines.length*5+2);
+  // SIGNATURES
+  y+=4;L(M,y+12,M+68,y+12);L(W-M-68,y+12,W-M,y+12);
+  T('Authorized Signatory',M,y+16,{s:8,c:[130,130,130]});T(co,M,y+21,{b:true,s:9});
+  T('Customer Signature & Date',W-M,y+16,{s:8,c:[130,130,130],a:'right'});T(name,W-M,y+21,{b:true,s:9,a:'right'});y+=28;
+  // TERMS
+  doc.setFontSize(7);doc.setTextColor(160,160,160);const tlines=doc.splitTextToSize('Terms & Conditions: '+terms,W-2*M);doc.text(tlines,M,y);y+=tlines.length*3.5+5;
+  L(M,y,W-M,y,200,200,200,0.3);
+  T(footer+' | '+qno+' | SolarQuote Pro',W/2,y+5,{s:7,c:[180,180,180],a:'center'});
+  // DOWNLOAD — Chrome fix
   const safeName=(name||'Quote').replace(/[^a-zA-Z0-9]/g,'_');
-  doc.save('SolarQuote_'+safeName+'_'+qno+'.pdf');
+  const fileName='SolarQuote_'+safeName+'_'+qno+'.pdf';
+  const pdfBlob=doc.output('blob');
+  const blobUrl=URL.createObjectURL(pdfBlob);
+  const a=document.createElement('a');a.href=blobUrl;a.download=fileName;a.style.display='none';
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(blobUrl);},3000);
 }
 </script>
 </body>
